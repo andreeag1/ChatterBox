@@ -1,15 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Chat.css";
 import { styled } from "@mui/material/styles";
-import { Button, TextField } from "@mui/material";
+import { Button, IconButton, TextField } from "@mui/material";
+import profile from "../../pictures/profile.png";
+import { makeStyles } from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
 
-const ColorButton = styled(Button)(({ theme }) => ({
-  color: theme.palette.getContrastText("#C2D3CD"),
-  color: "#C2D3CD",
-  backgroundColor: "#56494C",
-  "&:hover": {
-    backgroundColor: "#56494C",
+const CssTextField = styled(TextField)(({ theme }) => ({
+  input: {
+    color: "white",
   },
+  borderBlockColor: "black",
+  borderRadius: "3%",
 }));
 
 export default function Chat() {
@@ -20,20 +22,77 @@ export default function Chat() {
       </div>
       <div className="box">
         <div className="box-two">
-          <div className="description">
-            <h7>
-              Enter a username and room id to chat with anyone and play fun mini
-              games!
-            </h7>
+          <div className="chats">
+            <div className="your-chats">
+              <h3>Your Chats</h3>
+            </div>
+            <div className="chats-section">
+              <div className="single-chat">
+                <img className="profileImg" src={profile} alt="" />
+                <div className="names">
+                  <div className="convo-names">
+                    <h5>Jane Doe</h5>
+                  </div>
+                  <div className="convo">
+                    <h6>Heyyyyy!</h6>
+                  </div>
+                </div>
+              </div>
+              <div className="single-chat">
+                <img className="profileImg" src={profile} alt="" />
+                <div className="names">
+                  <div className="convo-names">
+                    <h5>John Doe</h5>
+                  </div>
+                  <div className="convo">
+                    <h6>Hello!</h6>
+                  </div>
+                </div>
+              </div>
+              <div className="single-chat">
+                <img className="profileImg" src={profile} alt="" />
+                <div className="names">
+                  <div className="convo-names">
+                    <h5>Jill Doe</h5>
+                  </div>
+                  <div className="convo">
+                    <h6>What's up!</h6>
+                  </div>
+                </div>
+              </div>
+              <div className="single-chat">
+                <img className="profileImg" src={profile} alt="" />
+                <div className="names">
+                  <div className="convo-names">
+                    <h5>Job Doe</h5>
+                  </div>
+                  <div className="convo">
+                    <h6>Heyyyyy!</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="textfield-one">
-            <TextField placeholder="username" sx={{ width: "350px" }} />
-          </div>
-          <div className="textfield-two">
-            <TextField placeholder="room id" sx={{ width: "350px" }} />
-          </div>
-          <div className="start-button">
-            <ColorButton>Start</ColorButton>
+          <div className="conversations">
+            <div className="other-user">
+              {/* <img className="otherUserProfileImg" src={profile} alt="" /> */}
+            </div>
+            <div className="type">
+              <CssTextField
+                fullWidth
+                variant="outlined"
+                placeholder="Type something..."
+                sx={{
+                  width: "600px",
+                }}
+                className="send-text"
+              />
+              <div className="send-button">
+                <IconButton>
+                  <SendIcon sx={{ color: "white", size: "medium" }} />
+                </IconButton>
+              </div>
+            </div>
           </div>
         </div>
       </div>

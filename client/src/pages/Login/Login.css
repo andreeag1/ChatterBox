@@ -1,0 +1,45 @@
+.login-page {
+  display: flex;
+  flex-direction: column;
+  background-size: cover;
+  padding-bottom: 24.2rem;
+  background-image: url("../../pictures/background.jpeg");
+  background-repeat: no-repeat;
+  background-position: right;
+  justify-content: right;
+  align-items: right;
+}
+
+.username {
+  position: relative;
+  margin-right: 150px;
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: right;
+  padding-top: 15rem;
+  color: white;
+  align-items: right;
+}
+
+.textfield {
+  display: flex;
+  flex-direction: column;
+  color: white;
+}
+
+.welcome-section {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: -1rem;
+}
+
+.chat-icon {
+  width: 70px;
+  height: 70px;
+  padding-left: 20px;
+}
+
+.enter-button {
+  padding-top: 2rem;
+}

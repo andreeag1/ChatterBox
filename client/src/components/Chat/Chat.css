@@ -6,55 +6,115 @@
 }
 
 .title {
-  margin-top: 100px;
+  margin-top: 20px;
   font-family: Caprasimo;
   font-size: 30px;
+  color: white;
 }
 
 .box {
-  width: 60vh;
-  min-width: 30vh;
-  height: 70vh;
+  width: 90%;
+  min-width: 20%;
+  height: 90vh;
   margin-top: 10px;
+  margin-left: 50px;
+  margin-right: 50px;
   justify-content: center;
-  background-color: #c2d3cd;
-  position: relative;
+  background-color: #d6dee1;
   align-items: center;
   display: flex;
   border-radius: 5%;
 }
 
 .box-two {
-  width: 56vh;
-  height: 66vh;
+  width: 96%;
+  height: 85vh;
   max-height: fit-content;
-  justify-content: center;
   display: flex;
-  flex-direction: column;
-  background-color: #afbfc0;
+  flex-direction: row;
+  background-color: #b9c3cd;
   position: relative;
   align-items: center;
   border-radius: 5%;
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
 
-.description {
-  margin-left: 20px;
-  padding-bottom: 80px;
-  width: 75%;
-  text-align: center;
+.your-chats {
 }
 
-.start-button {
-  padding-top: 100px;
+.chats {
+  padding-left: 4rem;
+  margin-bottom: 200px;
+  font-family: Caprasimo;
+  font-size: 20px;
 }
 
-.textfield-one {
-  margin-bottom: 60px;
-  background-color: #847e89;
+.chats-section {
+  height: 500px;
+  margin-top: -50px;
+  margin-bottom: auto;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-top: 2rem;
 }
 
-.textfield-two {
-  margin-top: 40px;
-  background-color: #847e89;
+.single-chat {
+  width: 40vh;
+  height: 70px;
+  background-color: #283038;
+  color: white;
+  border-radius: 5%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  margin-top: 2rem;
+}
+
+.profileImg {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-top: 0.8rem;
+  margin-left: 0.9rem;
+}
+
+.names {
+  font-family: "Courier New", Courier, monospace;
+  padding-left: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.convo-names {
+  margin-top: -14px;
+}
+
+.convo {
+  margin-top: -3.5rem;
+}
+
+.conversations {
+  background-color: #283038;
+  width: 84vh;
+  height: 73vh;
+  margin-left: 4rem;
+  margin-top: 3rem;
+  border-radius: 5%;
+}
+
+.type {
+  display: flex;
+  flex-direction: row;
+  margin-left: 2rem;
+  margin-top: 36rem;
+}
+
+.send-button {
+  margin-left: 2rem;
+}
+
+.otherUserProfileImg {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
 }

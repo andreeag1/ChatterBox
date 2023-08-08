@@ -1,5 +1,7 @@
 .home {
-  background-color: #9fa4a9;
+  background-color: #181012;
   background-size: cover;
-  padding-bottom: 121px;
+  padding-bottom: 24px;
+  background-position: center;
+  width: 100%;
 }

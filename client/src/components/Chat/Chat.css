@@ -23,7 +23,7 @@
   background-color: #d6dee1;
   align-items: center;
   display: flex;
-  border-radius: 5%;
+  border-radius: 25px;
 }
 
 .box-two {
@@ -35,7 +35,7 @@
   background-color: #b9c3cd;
   position: relative;
   align-items: center;
-  border-radius: 5%;
+  border-radius: 25px;
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
 
@@ -63,7 +63,7 @@
   height: 70px;
   background-color: #283038;
   color: white;
-  border-radius: 5%;
+  border-radius: 18px;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -100,13 +100,15 @@
   margin-left: 4rem;
   margin-top: 3rem;
   border-radius: 5%;
+  position: relative;
 }
 
 .type {
   display: flex;
   flex-direction: row;
   margin-left: 2rem;
-  margin-top: 36rem;
+  position: absolute;
+  bottom: 14px;
 }
 
 .send-button {
@@ -117,4 +119,53 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
+}
+
+.texts {
+  width: 90vh;
+  height: 63vh;
+  overflow-y: scroll;
+}
+
+.other-user {
+  display: flex;
+  flex-direction: row;
+  margin-top: 2rem;
+  margin-left: 0.9rem;
+  margin-bottom: 2rem;
+}
+
+.received-text {
+  background-color: white;
+  margin-left: 0.8rem;
+  padding-left: 1.2rem;
+  padding-right: 1.2rem;
+  padding-top: 0.8rem;
+  border-radius: 20px;
+  padding-bottom: 0.5rem;
+  max-width: 400px;
+  max-height: auto;
+}
+
+.current-user {
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+  align-content: right;
+  float: right;
+  padding-right: 4rem;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.sent-text {
+  background-color: #46a2ff;
+  padding-left: 1.2rem;
+  padding-right: 1.2rem;
+  padding-top: 0.8rem;
+  border-radius: 20px;
+  margin-right: 0.8rem;
+  max-width: 400px;
+  max-height: auto;
+  padding-bottom: 0.5rem;
 }

@@ -74,9 +74,65 @@ export default function Chat() {
             </div>
           </div>
           <div className="conversations">
-            <div className="other-user">
-              {/* <img className="otherUserProfileImg" src={profile} alt="" /> */}
+            <div className="texts">
+              <div className="other-user">
+                <img className="otherUserProfileImg" src={profile} alt="" />
+                <div className="received-text">
+                  heyyyy! What's up? zsdfkj asdfdfv ldjhv ksjdhfvba dkah
+                  vakdhgad advkah dfvdkf sd
+                </div>
+              </div>
+              <div className="other-user">
+                <img className="otherUserProfileImg" src={profile} alt="" />
+                <div className="received-text">
+                  heyyyy! What's up? zsdfkj asdfdfv ldjhv ksjdhfvba dkah
+                  vakdhgad advkah dfvdkf sd
+                </div>
+              </div>
+              <div className="other-user">
+                <img className="otherUserProfileImg" src={profile} alt="" />
+                <div className="received-text">
+                  heyyyy! What's up? zsdfkj asdfdfv ldjhv ksjdhfvba dkah
+                  vakdhgad advkah dfvdkf sd
+                </div>
+              </div>
+              <div className="other-user">
+                <img className="otherUserProfileImg" src={profile} alt="" />
+                <div className="received-text">
+                  heyyyy! What's up? zsdfkj asdfdfdh dhsf sdf sdhfshdf sdfhs
+                  dfsdh
+                </div>
+              </div>
+              <div className="current-user">
+                <div className="sent-text">
+                  Nothing much, you? skdfjhsdkjf adfjhasasfhadjsh asdkjfha
+                  askdfjh adskfjhsd dsfkjdhf sd
+                </div>
+                <img className="otherUserProfileImg" src={profile} alt="" />
+              </div>
+              <div className="other-user">
+                <img className="otherUserProfileImg" src={profile} alt="" />
+                <div className="received-text">
+                  heyyyy! What's up? zsdfkj asdfdfv ldjhv ksjdhfvba dkah sdfhs
+                  dfsdh
+                </div>
+              </div>
+              <div className="current-user">
+                <div className="sent-text">
+                  Nothing much, you? skdfjhsdkjf adfjhasasfhadjsh asdkjfha
+                  askdfjh adskfjhsd dsfkjdhf sd
+                </div>
+                <img className="otherUserProfileImg" src={profile} alt="" />
+              </div>
+              <div className="current-user">
+                <div className="sent-text">
+                  Nothing much, you? skdfjhsdkjf adfjhasasfhadjsh asdkjfha
+                  askdfjh adskfjhsd dsfkjdhf sd
+                </div>
+                <img className="otherUserProfileImg" src={profile} alt="" />
+              </div>
             </div>
+
             <div className="type">
               <CssTextField
                 fullWidth

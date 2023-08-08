@@ -42,6 +42,28 @@ export default function Chat() {
                 <img className="profileImg" src={profile} alt="" />
                 <div className="names">
                   <div className="convo-names">
+                    <h5>Jane Doe</h5>
+                  </div>
+                  <div className="convo">
+                    <h6>Heyyyyy!</h6>
+                  </div>
+                </div>
+              </div>
+              <div className="single-chat">
+                <img className="profileImg" src={profile} alt="" />
+                <div className="names">
+                  <div className="convo-names">
+                    <h5>Jane Doe</h5>
+                  </div>
+                  <div className="convo">
+                    <h6>Heyyyyy!</h6>
+                  </div>
+                </div>
+              </div>
+              <div className="single-chat">
+                <img className="profileImg" src={profile} alt="" />
+                <div className="names">
+                  <div className="convo-names">
                     <h5>John Doe</h5>
                   </div>
                   <div className="convo">

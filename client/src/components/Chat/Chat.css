@@ -16,6 +16,7 @@
   width: 90%;
   min-width: 20%;
   height: 90vh;
+  max-height: 200%;
   margin-top: 10px;
   margin-left: 50px;
   margin-right: 50px;
@@ -32,6 +33,7 @@
   max-height: fit-content;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   background-color: #b9c3cd;
   position: relative;
   align-items: center;
@@ -40,53 +42,96 @@
 }
 
 .your-chats {
+  padding-left: 1rem;
+  padding-top: 3rem;
 }
 
 .chats {
   padding-left: 4rem;
-  margin-bottom: 200px;
+  margin-top: -170px;
   font-family: Caprasimo;
   font-size: 20px;
 }
 
 .chats-section {
-  height: 500px;
-  margin-top: -50px;
-  margin-bottom: auto;
+  height: 650px;
+  margin-top: 0px;
   justify-content: flex-start;
   align-items: flex-start;
-  padding-top: 2rem;
+  margin-bottom: 3rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 15px;
+  padding-left: 10px;
 }
 
 .single-chat {
-  width: 40vh;
-  height: 70px;
-  background-color: #283038;
-  color: white;
+  height: 100px;
+  width: 300px;
+  margin-bottom: 2rem;
+  position: relative;
+  color: black;
   border-radius: 18px;
-  display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 1.5rem sans-serif;
+  cursor: pointer;
+  will-change: transform;
+}
+
+.single-chat::before,
+.single-chat::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: "";
+  display: block;
+  background-color: #283038;
+  transition: all 250ms ease-in-out;
+}
+
+.single-chat::before {
+  width: 2px;
+  height: 100px;
+  box-shadow: 298px 0 #283038;
+}
+
+.single-chat::after {
+  height: 2px;
+  width: 300px;
+  box-shadow: 0 98px #283038;
+}
+
+.single-chat:hover::before {
+  left: -10px;
+  box-shadow: 318px 0 #283038;
+}
+
+.single-chat:hover::after {
+  top: -10px;
+  box-shadow: 0 118px #283038;
 }
 
 .profileImg {
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  margin-top: 0.8rem;
-  margin-left: 0.9rem;
+  margin-top: 0rem;
+  margin-right: 2rem;
 }
 
 .names {
   font-family: "Courier New", Courier, monospace;
-  padding-left: 2rem;
+  margin-right: 5rem;
   display: flex;
   flex-direction: column;
 }
 
 .convo-names {
-  margin-top: -14px;
+  margin-top: -5px;
 }
 
 .convo {
@@ -95,12 +140,16 @@
 
 .conversations {
   background-color: #283038;
-  width: 84vh;
+  width: 57%;
+  min-width: 50%;
   height: 73vh;
   margin-left: 4rem;
   margin-top: 3rem;
   border-radius: 5%;
   position: relative;
+  margin-bottom: 200px;
+  display: flex;
+  flex-direction: column;
 }
 
 .type {
@@ -122,9 +171,35 @@
 }
 
 .texts {
-  width: 90vh;
+  width: 100%;
+  min-width: 50%;
   height: 63vh;
   overflow-y: scroll;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+::-webkit-scrollbar {
+  padding-right: 30px;
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: gainsboro;
+  border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #181012;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 .other-user {
@@ -168,4 +243,10 @@
   max-width: 400px;
   max-height: auto;
   padding-bottom: 0.5rem;
+}
+
+@media (max-width: 1247px) {
+  .chats {
+    margin-top: 0rem;
+  }
 }

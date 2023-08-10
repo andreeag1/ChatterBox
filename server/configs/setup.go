@@ -17,18 +17,12 @@ func ConnectDB() *mongo.Client {
 		panic(err)
 	}
 
-
 	fmt.Println("MongoDB connection success")
-
-
 	return client
-
-
 }
 
 var DB *mongo.Client = ConnectDB()
 
-//getting database collections
 func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
     collection := client.Database("chatterbox").Collection(collectionName)
     return collection

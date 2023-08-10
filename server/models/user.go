@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -21,8 +23,10 @@ func (user *User) HashPassword(password string) error {
 	return nil
 }
 func (user *User) CheckPassword(providedPassword string) error {
+	fmt.Println(user.Password)
+	fmt.Println(providedPassword)
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(providedPassword))
-	if err != nil {
+	if err != nil {	
 		return err
 	}
 	return nil

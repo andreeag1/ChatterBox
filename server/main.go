@@ -7,6 +7,7 @@ import (
 
 	"github.com/andreeag1/chatterbox/configs"
 	"github.com/andreeag1/chatterbox/controllers"
+	"github.com/andreeag1/chatterbox/lib"
 	"github.com/gorilla/mux"
 )
 
@@ -16,6 +17,8 @@ func main() {
 	configs.ConnectDB()
 
 	r.HandleFunc("/user/add", controllers.AddUser()).Methods("POST")
+	r.HandleFunc("/user/login", controllers.Login()).Methods("POST")
+	r.HandleFunc("/user/logout", lib.VerifyJWT(controllers.Logout())).Methods("POST")
 
 	fmt.Println("Server is getting started...")
 	log.Fatal(http.ListenAndServe(":9000", r))

@@ -7,7 +7,6 @@ import (
 
 	"github.com/andreeag1/chatterbox/configs"
 	"github.com/andreeag1/chatterbox/controllers"
-	"github.com/andreeag1/chatterbox/lib"
 	"github.com/andreeag1/chatterbox/websocket"
 	"github.com/gorilla/mux"
 )
@@ -30,14 +29,19 @@ func WsHandler(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	r := mux.NewRouter()
+
 	pool := websocket.NewPool()
 	go pool.Start()
 
+	user := controllers.NewUser(configs.ConnectDB())
+	message := controllers.NewMessage(configs.ConnectDB())
+
 	configs.ConnectDB()
 
-	r.HandleFunc("/user/add", controllers.AddUser()).Methods("POST")
-	r.HandleFunc("/user/login", controllers.Login()).Methods("POST")
-	r.HandleFunc("/user/logout", lib.VerifyJWT(controllers.Logout())).Methods("POST")
+	r.HandleFunc("/user/add", user.AddUser).Methods("POST")
+	r.HandleFunc("/user/login", user.Login).Methods("POST")
+	r.HandleFunc("/message/add", message.AddMessage).Methods("POST")
+	r.HandleFunc("/message/get", message.GetMessageByUser).Methods("GET")
 	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
         WsHandler(pool, w, r)})
 

@@ -20,10 +20,3 @@ func ConnectDB() *mongo.Client {
 	fmt.Println("MongoDB connection success")
 	return client
 }
-
-var DB *mongo.Client = ConnectDB()
-
-func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
-    collection := client.Database("chatterbox").Collection(collectionName)
-    return collection
-}

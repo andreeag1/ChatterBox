@@ -35,6 +35,7 @@ func main() {
 
 	user := controllers.NewUser(configs.ConnectDB())
 	message := controllers.NewMessage(configs.ConnectDB())
+	group := controllers.NewGroup(configs.ConnectDB())
 
 	configs.ConnectDB()
 
@@ -42,6 +43,8 @@ func main() {
 	r.HandleFunc("/user/login", user.Login).Methods("POST")
 	r.HandleFunc("/message/add", message.AddMessage).Methods("POST")
 	r.HandleFunc("/message/get", message.GetMessageByUser).Methods("GET")
+	r.HandleFunc("/group/add", group.AddGroup).Methods("POST")
+	r.HandleFunc("/group/user", group.AddUserToGroup).Methods("POST")
 	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
         WsHandler(pool, w, r)})
 

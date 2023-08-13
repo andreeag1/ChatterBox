@@ -42,6 +42,9 @@
 }
 
 .your-chats {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   padding-left: 1rem;
   padding-top: 3rem;
 }
@@ -138,12 +141,26 @@
   margin-top: -3.5rem;
 }
 
+.right-section {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  width: 800px;
+}
+
+.profile-section {
+  height: 20px;
+  margin-left: 47rem;
+  margin-top: 0.3rem;
+}
+
 .conversations {
   background-color: #283038;
-  width: 57%;
+  width: 95%;
   min-width: 50%;
-  height: 73vh;
+  height: 75vh;
   margin-left: 4rem;
+  padding-top: -1rem;
   margin-top: 3rem;
   border-radius: 5%;
   position: relative;
@@ -152,12 +169,43 @@
   flex-direction: column;
 }
 
+.add-user {
+  display: flex;
+  flex-direction: row;
+  height: 0px;
+  padding-top: 0.2rem;
+  padding-left: 2rem;
+}
+
+.add-button {
+  margin-left: 1rem;
+  width: 40px;
+}
+
+.myProfileImg {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.texts {
+  width: 100%;
+  min-width: 50%;
+  height: 60vh;
+  margin-top: 3.9rem;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
 .type {
   display: flex;
   flex-direction: row;
   margin-left: 2rem;
   position: absolute;
-  bottom: 14px;
+  bottom: 5px;
 }
 
 .send-button {
@@ -168,16 +216,6 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-}
-
-.texts {
-  width: 100%;
-  min-width: 50%;
-  height: 63vh;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column-reverse;
 }
 
 ::-webkit-scrollbar {

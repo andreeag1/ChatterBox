@@ -1,13 +1,15 @@
 .login-page {
+  max-height: 566px;
   display: flex;
   flex-direction: column;
   background-size: cover;
-  padding-bottom: 24.2rem;
+  padding-bottom: 19.99rem;
   background-image: url("../../pictures/background.jpeg");
   background-repeat: no-repeat;
   background-position: right;
   justify-content: right;
   align-items: right;
+  overflow-y: hidden;
 }
 
 .username {
@@ -17,7 +19,7 @@
   display: flex;
   flex-direction: column;
   justify-content: right;
-  padding-top: 15rem;
+  padding-top: 11rem;
   color: white;
   align-items: right;
 }
@@ -26,6 +28,7 @@
   display: flex;
   flex-direction: column;
   color: white;
+  margin-top: 20px;
 }
 
 .welcome-section {
@@ -42,4 +45,33 @@
 
 .enter-button {
   padding-top: 2rem;
+}
+
+.login-signup-buttons {
+  width: 240px;
+  display: flex;
+  flex-direction: row;
+  margin-top: -0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 7rem;
+  justify-content: space-between;
+}
+
+.input-error {
+  display: flex;
+  flex-direction: column;
+  color: white;
+  margin-top: 20px;
+}
+
+.input-error:hover {
+  box-shadow: 0 0.2em 0.7em #ff0000;
+}
+
+.error {
+  color: red;
+  padding-right: 13rem;
+  font-size: 1rem;
+  margin-bottom: -10px;
+  margin-top: 10px;
 }

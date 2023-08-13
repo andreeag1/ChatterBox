@@ -82,6 +82,6 @@ func (g GroupImplementation) AddUserToGroup(w http.ResponseWriter, r *http.Reque
 		log.Fatal(err)
 	}
 
-	fmt.Println("User was added to group", results)
+	fmt.Println(results.ModifiedCount, "user was added to group")
 
 }

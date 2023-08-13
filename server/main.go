@@ -9,6 +9,7 @@ import (
 	"github.com/andreeag1/chatterbox/controllers"
 	"github.com/andreeag1/chatterbox/websocket"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func WsHandler(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
@@ -39,6 +40,11 @@ func main() {
 
 	configs.ConnectDB()
 
+	c := cors.New(cors.Options{
+        AllowedOrigins: []string{"http://localhost:3000"},
+        AllowCredentials: true,
+    })
+
 	r.HandleFunc("/user/add", user.AddUser).Methods("POST")
 	r.HandleFunc("/user/login", user.Login).Methods("POST")
 	r.HandleFunc("/message/add", message.AddMessage).Methods("POST")
@@ -48,7 +54,9 @@ func main() {
 	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
         WsHandler(pool, w, r)})
 
+	handler := c.Handler(r)
+
 	fmt.Println("Server is getting started...")
-	log.Fatal(http.ListenAndServe(":9000", r))
+	log.Fatal(http.ListenAndServe(":9000", handler))
 	fmt.Println("Listening on port 9000...")
 }

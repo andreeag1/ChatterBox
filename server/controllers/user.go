@@ -43,20 +43,24 @@ func (u UserImplementation) AddUser(w http.ResponseWriter, r *http.Request) {
 
 	cursor, err := userCollection.Find(ctx, filter)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 
 	var results []models.User
 	if err := cursor.All(ctx, &results); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 
 	if len(results) > 0 {
-		log.Fatal("This user already exists")
+		fmt.Println("This user already exists")
+		return
 	}
 
 	if err := user.HashPassword(user.Password); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 
 	newUser := models.User{
@@ -67,7 +71,8 @@ func (u UserImplementation) AddUser(w http.ResponseWriter, r *http.Request) {
 
 	result, err := userCollection.InsertOne(ctx, newUser)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 
 	json.NewEncoder(w).Encode(result)

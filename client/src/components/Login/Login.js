@@ -6,6 +6,7 @@ import Chat from "../../pictures/chat.png";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import { loginSchema } from "../../schemas";
+import { loginUser } from "../../modules/users/userRepository";
 
 const ColorButton = styled(Button)(({ theme }) => ({
   color: theme.palette.getContrastText("#C2D3CD"),
@@ -26,10 +27,20 @@ const CssTextField = styled(TextField)(({ theme }) => ({
 }));
 
 export default function Login({ login, setLogin }) {
+  const [error, setError] = React.useState(false);
   const navigate = useNavigate();
 
   const handleClick = () => {
     navigate("/home");
+  };
+
+  const onSubmit = async () => {
+    const login = await loginUser(values.loginUsername, values.loginPassword);
+    if (login === 403) {
+      setError(true);
+    } else {
+      navigate("/home");
+    }
   };
 
   const { values, errors, touched, handleChange, handleBlur, handleSubmit } =
@@ -39,6 +50,7 @@ export default function Login({ login, setLogin }) {
         loginPassword: "",
       },
       validationSchema: loginSchema,
+      onSubmit,
     });
 
   return (
@@ -117,11 +129,12 @@ export default function Login({ login, setLogin }) {
         ) : (
           <div />
         )}
+        {error ? <p className="error">Invalid Credentials</p> : <div></div>}
         <div className="enter-button">
           <ColorButton
             fullWidth
             style={{ minWidth: "100px" }}
-            onClick={handleClick}
+            onClick={handleSubmit}
           >
             Enter
           </ColorButton>

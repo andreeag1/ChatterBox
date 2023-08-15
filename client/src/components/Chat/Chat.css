@@ -189,17 +189,6 @@
   cursor: pointer;
 }
 
-.texts {
-  width: 100%;
-  min-width: 50%;
-  height: 60vh;
-  margin-top: 3.9rem;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column-reverse;
-}
-
 .type {
   display: flex;
   flex-direction: row;
@@ -238,49 +227,6 @@
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
-}
-
-.other-user {
-  display: flex;
-  flex-direction: row;
-  margin-top: 2rem;
-  margin-left: 0.9rem;
-  margin-bottom: 2rem;
-}
-
-.received-text {
-  background-color: white;
-  margin-left: 0.8rem;
-  padding-left: 1.2rem;
-  padding-right: 1.2rem;
-  padding-top: 0.8rem;
-  border-radius: 20px;
-  padding-bottom: 0.5rem;
-  max-width: 400px;
-  max-height: auto;
-}
-
-.current-user {
-  display: flex;
-  flex-direction: row;
-  justify-content: right;
-  align-content: right;
-  float: right;
-  padding-right: 4rem;
-  width: 100%;
-  margin-bottom: 2rem;
-}
-
-.sent-text {
-  background-color: #46a2ff;
-  padding-left: 1.2rem;
-  padding-right: 1.2rem;
-  padding-top: 0.8rem;
-  border-radius: 20px;
-  margin-right: 0.8rem;
-  max-width: 400px;
-  max-height: auto;
-  padding-bottom: 0.5rem;
 }
 
 @media (max-width: 1247px) {

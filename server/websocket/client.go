@@ -8,15 +8,18 @@ import (
 )
 
 type Client struct {
-	ID 		string
+	ID 		string  `json:"id"`
+    Message  chan *Message
 	Conn 	*websocket.Conn
 	Pool 	*Pool
+    Username string `json:"username"`
 }
 
 type Message struct {
-    Type int    `json:"type"`
-    Body string `json:"body"`
+	Content  string `json:"content"`
+	Username string `json:"username"`
 }
+
 
 func (c *Client) Read() {
 	defer func() {
@@ -25,12 +28,12 @@ func (c *Client) Read() {
     }()
 
     for {
-        messageType, p, err := c.Conn.ReadMessage()
+        _, p, err := c.Conn.ReadMessage()
         if err != nil {
             log.Println(err)
             return
         }
-        message := Message{Type: messageType, Body: string(p)}
+        message := &Message{Content: string(p), Username: c.Username}
         c.Pool.Broadcast <- message
         fmt.Printf("Message Received: %+v\n", message)
     }

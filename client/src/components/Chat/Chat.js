@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import "./Chat.css";
 import { styled } from "@mui/material/styles";
 import {
@@ -14,6 +14,10 @@ import profile from "../../pictures/profile.png";
 import { makeStyles } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import WebSocketProvider, {
+  WebsocketContext,
+} from "../../modules/websocket/webSocketProvider";
+import ChatBody from "../ChatBody/ChatBody";
 
 const CssTextField = styled(TextField)(({ theme }) => ({
   input: {
@@ -35,6 +39,10 @@ const ColorButton = styled(Button)(({ theme }) => ({
 
 export default function Chat() {
   const [openProfileDialog, setOpenProfileDialog] = React.useState(false);
+  const [message, setMessage] = React.useState([]);
+  const [sentText, setSentText] = React.useState("");
+  const { setConn } = useContext(WebsocketContext);
+  const { conn } = useContext(WebsocketContext);
 
   const handleClickOpen = () => {
     setOpenProfileDialog(true);
@@ -43,6 +51,65 @@ export default function Chat() {
   const handleClose = () => {
     setOpenProfileDialog(false);
   };
+
+  const handleSendText = () => {
+    if (conn !== null) {
+      console.log(sentText);
+      conn.send(sentText);
+
+      setSentText("");
+    }
+  };
+
+  const JoinGroup = () => {
+    const ws = new WebSocket(`ws://localhost:9000/ws/blue`);
+    if (ws.OPEN) {
+      setConn(ws);
+      return;
+    }
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleSendText();
+    }
+  };
+
+  useEffect(() => {
+    if (conn === null) {
+      return;
+    }
+
+    conn.onopen = () => {
+      console.log("Connected Successfully");
+    };
+
+    conn.onmessage = (event) => {
+      const m = JSON.parse(event.data);
+      console.log(m);
+
+      if (m.content === "New User Joined...") {
+        console.log("new user joined");
+      } else if (m.content === "User Disconnected...") {
+        console.log("User Disconnected...");
+      } else if (m.username === "blue") {
+        console.log(m);
+        const newMessage = {
+          Type: "self",
+          Content: m.content,
+        };
+        setMessage([...message, newMessage]);
+      } else {
+        console.log("hello");
+        const newMessage = {
+          Type: "received",
+          Content: m.content,
+        };
+        setMessage([...message, newMessage]);
+      }
+    };
+  }, [conn, message]);
+
   return (
     <div className="chat-section">
       <div className="title">
@@ -55,6 +122,7 @@ export default function Chat() {
               <h3>Your Chats</h3>
               <ColorButton
                 sx={{ width: "100px", height: "40px", marginTop: "15px" }}
+                onClick={JoinGroup}
               >
                 New Chat
               </ColorButton>
@@ -168,67 +236,11 @@ export default function Chat() {
                   </IconButton>
                 </div>
               </div>
-              <div className="texts">
-                <div className="other-user">
-                  <img className="otherUserProfileImg" src={profile} alt="" />
-                  <div className="received-text">
-                    heyyyy! What's up? zsdfkj asdfdfv ldjhv ksjdhfvba dkah
-                    vakdhgad advkah dfvdkf sd
-                  </div>
-                </div>
-                <div className="other-user">
-                  <img className="otherUserProfileImg" src={profile} alt="" />
-                  <div className="received-text">
-                    heyyyy! What's up? zsdfkj asdfdfv ldjhv ksjdhfvba dkah
-                    vakdhgad advkah dfvdkf sd
-                  </div>
-                </div>
-                <div className="other-user">
-                  <img className="otherUserProfileImg" src={profile} alt="" />
-                  <div className="received-text">
-                    heyyyy! What's up? zsdfkj asdfdfv ldjhv ksjdhfvba dkah
-                    vakdhgad advkah dfvdkf sd
-                  </div>
-                </div>
-                <div className="other-user">
-                  <img className="otherUserProfileImg" src={profile} alt="" />
-                  <div className="received-text">
-                    heyyyy! What's up? zsdfkj asdfdfdh dhsf sdf sdhfshdf sdfhs
-                    dfsdh
-                  </div>
-                </div>
-                <div className="current-user">
-                  <div className="sent-text">
-                    Nothing much, you? skdfjhsdkjf adfjhasasfhadjsh asdkjfha
-                    askdfjh adskfjhsd dsfkjdhf sd
-                  </div>
-                  <img className="otherUserProfileImg" src={profile} alt="" />
-                </div>
-                <div className="other-user">
-                  <img className="otherUserProfileImg" src={profile} alt="" />
-                  <div className="received-text">
-                    heyyyy! What's up? zsdfkj asdfdfv ldjhv ksjdhfvba dkah sdfhs
-                    dfsdh
-                  </div>
-                </div>
-                <div className="current-user">
-                  <div className="sent-text">
-                    Nothing much, you? skdfjhsdkjf adfjhasasfhadjsh asdkjfha
-                    askdfjh adskfjhsd dsfkjdhf sd
-                  </div>
-                  <img className="otherUserProfileImg" src={profile} alt="" />
-                </div>
-                <div className="current-user">
-                  <div className="sent-text">
-                    Nothing much, you? skdfjhsdkjf adfjhasasfhadjsh asdkjfha
-                    askdfjh adskfjhsd dsfkjdhf sd
-                  </div>
-                  <img className="otherUserProfileImg" src={profile} alt="" />
-                </div>
-              </div>
+              <ChatBody message={message} />
 
               <div className="type">
                 <CssTextField
+                  value={sentText}
                   fullWidth
                   variant="outlined"
                   placeholder="Type something..."
@@ -236,10 +248,15 @@ export default function Chat() {
                     width: "600px",
                   }}
                   className="send-text"
+                  onChange={(e) => setSentText(e.target.value)}
+                  onKeyDown={handleKeyDown}
                 />
                 <div className="send-button">
                   <IconButton>
-                    <SendIcon sx={{ color: "white", size: "medium" }} />
+                    <SendIcon
+                      sx={{ color: "white", size: "medium" }}
+                      onClick={handleSendText}
+                    />
                   </IconButton>
                 </div>
               </div>

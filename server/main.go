@@ -19,9 +19,12 @@ func WsHandler(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
         fmt.Fprintf(w, "%+v\n", err)
     }
 
+	username := mux.Vars(r)["username"]
+
     client := &websocket.Client{
         Conn: conn,
         Pool: pool,
+		Username: username,
     }
 
     pool.Register <- client
@@ -47,11 +50,12 @@ func main() {
 
 	r.HandleFunc("/user/add", user.AddUser).Methods("POST")
 	r.HandleFunc("/user/login", user.Login).Methods("POST")
+	r.HandleFunc("/user/get", user.GetCurrentUser).Methods("GET")
 	r.HandleFunc("/message/add", message.AddMessage).Methods("POST")
 	r.HandleFunc("/message/get", message.GetMessageByUser).Methods("GET")
 	r.HandleFunc("/group/add", group.AddGroup).Methods("POST")
 	r.HandleFunc("/group/user", group.AddUserToGroup).Methods("POST")
-	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/ws/{username}", func(w http.ResponseWriter, r *http.Request) {
         WsHandler(pool, w, r)})
 
 	handler := c.Handler(r)

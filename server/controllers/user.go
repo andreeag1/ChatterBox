@@ -1,19 +1,15 @@
 package controllers
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/andreeag1/chatterbox/configs"
 	"github.com/andreeag1/chatterbox/lib"
 	"github.com/andreeag1/chatterbox/models"
+	"github.com/andreeag1/chatterbox/repositories"
 	"github.com/golang-jwt/jwt/v5"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type User interface {
@@ -23,12 +19,12 @@ type User interface {
 }
 
 type UserImplementation struct {
-	client *mongo.Client
+	repository repositories.UserRepository
 }
 
-func NewUser(client *mongo.Client) User {
+func NewUser(repository repositories.UserRepository) User {
 	return UserImplementation{
-		client: client,
+		repository: repository,
 	}
 }
 
@@ -39,29 +35,11 @@ func WriteJSON(w http.ResponseWriter, status int, v any) error {
 }
 
 func (u UserImplementation) AddUser(w http.ResponseWriter, r *http.Request) {
-	userCollection := u.client.Database("chatterbox").Collection("users")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	var user models.User
-	defer cancel()
-
 	json.NewDecoder(r.Body).Decode(&user)
 
-	filter := bson.D{{Key: "username", Value: user.Username}}
-
-	cursor, err := userCollection.Find(ctx, filter)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	var results []models.User
-	if err := cursor.All(ctx, &results); err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	if len(results) > 0 {
+	_, err := u.repository.FindUserByUsername(r.Context(), user.Username)
+	if (err == nil) {
 		fmt.Println("This user already exists")
 		return
 	}
@@ -71,17 +49,25 @@ func (u UserImplementation) AddUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newUser := models.User{
-		Id: 		primitive.NewObjectID(),
-		Username: 	user.Username,
-		Password:	user.Password,
+	result := u.repository.InsertUser(r.Context(), user.Username, user.Password)
+	if (result == nil) {
+		fmt.Println(result)
+		return
 	}
 
-	result, err := userCollection.InsertOne(ctx, newUser)
+	jwtToken, err := lib.GenerateJWT(user.Username)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "access-token",
+		Value:   jwtToken,
+		Path: 	 "/",
+		MaxAge:  3600,
+        Secure:   false,
+	})
 
 	WriteJSON(w, http.StatusAccepted, result)
 	fmt.Println("Inserted 1 user in db with id", result.InsertedID)
@@ -92,25 +78,17 @@ func (u UserImplementation) Login(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Access-Control-Allow-Credentials", "true")
     w.Header().Set("Access-Control-Allow-Headers", "Content-Type, withCredentials")
 
-	userCollection := u.client.Database("chatterbox").Collection("users")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	var user models.User
-	defer cancel()
-
 	json.NewDecoder(r.Body).Decode(&user)
 
 	password := user.Password
 	username := user.Username
-	filter := bson.M{"username": username}
 
-	var result models.User
-	err := userCollection.FindOne(ctx, filter).Decode(&result)
-
-	if err == mongo.ErrNoDocuments {
-		fmt.Println(err, "This user does not exist")
+	result, err := u.repository.FindUserByUsername(r.Context(), user.Username)
+	if (err != nil) {
+		fmt.Println("This user does not exist")
 		return
-	} 
+	}
 
 	if err := result.CheckPassword(password); err != nil {
 		fmt.Println(err, "Invalid Credentials")
@@ -138,9 +116,7 @@ func (u UserImplementation) Login(w http.ResponseWriter, r *http.Request) {
 
 func (u UserImplementation) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	for _, c := range r.Cookies() {
-		fmt.Println(c.Name)
 		if c.Name == "access-token" {
-			fmt.Println(c.Value)
 			tokenString := c.Value
 			token, err := jwt.ParseWithClaims(tokenString, &lib.AccessTokenClaims{}, func(t *jwt.Token) (interface{}, error) {
 				_, ok := t.Method.(*jwt.SigningMethodHMAC)

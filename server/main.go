@@ -7,6 +7,7 @@ import (
 
 	"github.com/andreeag1/chatterbox/configs"
 	"github.com/andreeag1/chatterbox/controllers"
+	"github.com/andreeag1/chatterbox/repositories"
 	"github.com/andreeag1/chatterbox/websocket"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -37,9 +38,12 @@ func main() {
 	pool := websocket.NewPool()
 	go pool.Start()
 
-	user := controllers.NewUser(configs.ConnectDB())
+	userRepository := repositories.NewUserRepository(configs.ConnectDB())
+	groupRepository := repositories.NewGroupRepository(configs.ConnectDB())
+
+	user := controllers.NewUser(userRepository)
 	message := controllers.NewMessage(configs.ConnectDB())
-	group := controllers.NewGroup(configs.ConnectDB())
+	group := controllers.NewGroup(groupRepository)
 
 	configs.ConnectDB()
 
@@ -55,7 +59,7 @@ func main() {
 	r.HandleFunc("/message/get", message.GetMessageByUser).Methods("GET")
 	r.HandleFunc("/group/add", group.AddGroup).Methods("POST")
 	r.HandleFunc("/group/user", group.AddUserToGroup).Methods("POST")
-	r.HandleFunc("/group/get", group.GetGroups).Methods("GET")
+	r.HandleFunc("/group/{username}", group.GetGroupsByUsername).Methods("GET")
 	r.HandleFunc("/ws/{username}", func(w http.ResponseWriter, r *http.Request) {
         WsHandler(pool, w, r)})
 

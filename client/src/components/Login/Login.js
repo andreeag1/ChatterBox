@@ -35,11 +35,11 @@ export default function Login({ login, setLogin }) {
   };
 
   const onSubmit = async () => {
-    const login = await loginUser(values.loginUsername, values.loginPassword);
-    if (login === 403) {
-      setError(true);
-    } else {
+    try {
+      const login = await loginUser(values.loginUsername, values.loginPassword);
       navigate("/home");
+    } catch (error) {
+      setError(true);
     }
   };
 

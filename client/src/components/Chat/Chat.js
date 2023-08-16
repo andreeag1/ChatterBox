@@ -19,7 +19,7 @@ import WebSocketProvider, {
 } from "../../modules/websocket/webSocketProvider";
 import ChatBody from "../ChatBody/ChatBody";
 import {
-  GetAllGroups,
+  GetGroupsByUsername,
   addGroup,
   addUserToGroup,
 } from "../../modules/groups/groupRepository";
@@ -88,7 +88,7 @@ export default function Chat() {
 
   const CreateGroup = async () => {
     const username = await getCurrentUser();
-    const ws = new WebSocket(`ws://localhost:9000/ws/${username}`);
+    const ws = new WebSocket(`ws://localhost:9000/ws/${username.username}`);
     if (ws.OPEN) {
       try {
         console.log(username);
@@ -106,8 +106,11 @@ export default function Chat() {
 
   useEffect(() => {
     const HandleGroups = async () => {
+      const username = await getCurrentUser();
+
       try {
-        const groupResults = await GetAllGroups();
+        console.log(username);
+        const groupResults = await GetGroupsByUsername(username.username);
         console.log(groupResults);
         setGroups(groupResults);
       } catch (error) {
@@ -135,9 +138,10 @@ export default function Chat() {
         return;
       }
 
-      const username = "";
+      var username = {};
       try {
         username = await getCurrentUser();
+        console.log(username);
       } catch (error) {
         console.log(error);
       }
@@ -154,7 +158,7 @@ export default function Chat() {
           console.log("new user joined");
         } else if (m.content === "User Disconnected...") {
           console.log("User Disconnected...");
-        } else if (m.username === username) {
+        } else if (m.username === username.username) {
           console.log(m);
           const newMessage = {
             Type: "self",

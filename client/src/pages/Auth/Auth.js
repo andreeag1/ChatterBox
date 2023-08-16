@@ -42,11 +42,11 @@ export default function Auth() {
 
   const onSubmit = async () => {
     console.log("hello");
-    const register = await registerUser(values.username, values.password);
-    if (register === 403) {
-      setError(true);
-    } else {
+    try {
+      const register = await registerUser(values.username, values.password);
       navigate("/home");
+    } catch (error) {
+      setError(true);
     }
   };
 

@@ -37,8 +37,8 @@ export const addUserToGroup = async (username, group) => {
   }
 };
 
-export const GetAllGroups = async () => {
-  const res = await fetch(`http://localhost:9000/group/get`, {
+export const GetGroupsByUsername = async (username) => {
+  const res = await fetch(`http://localhost:9000/group/${username}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

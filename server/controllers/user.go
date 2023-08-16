@@ -158,9 +158,13 @@ func (u UserImplementation) GetCurrentUser(w http.ResponseWriter, r *http.Reques
 
 			claims, ok := token.Claims.(*lib.AccessTokenClaims)
 				if ok && token.Valid {
-					username := claims.Username
-					WriteJSON(w, http.StatusAccepted, username)
-					fmt.Println(username)
+					type newObj struct {
+						Username string	`json:"username"`
+					}
+					var result newObj
+					result.Username = claims.Username
+					WriteJSON(w, http.StatusAccepted, result)
+					fmt.Println(result)
 					return
 				}
 			fmt.Println("unable to extract claims")

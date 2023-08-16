@@ -34,11 +34,25 @@ export const loginUser = async (username, password) => {
     });
     const data = await res.json();
     console.log(data);
-    document.cookie = `goCookie=${res.cookie}; path=/; domain=localhost`;
-    console.log(document.cookie);
     return 200;
   } catch (error) {
     console.log("invalid credentials");
     return 403;
+  }
+};
+
+export const getCurrentUser = async () => {
+  try {
+    const res = await fetch(`http://localhost:9000/user/get`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.log(error);
   }
 };

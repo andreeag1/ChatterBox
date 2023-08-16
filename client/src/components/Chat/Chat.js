@@ -23,6 +23,7 @@ import {
   addGroup,
   addUserToGroup,
 } from "../../modules/groups/groupRepository";
+import { getCurrentUser } from "../../modules/users/userRepository";
 
 const CssTextField = styled(TextField)(({ theme }) => ({
   input: {
@@ -86,14 +87,20 @@ export default function Chat() {
   };
 
   const CreateGroup = async () => {
-    const ws = new WebSocket(`ws://localhost:9000/ws/blue`);
+    const username = await getCurrentUser();
+    const ws = new WebSocket(`ws://localhost:9000/ws/${username}`);
     if (ws.OPEN) {
-      setNewGroup(true);
-      const users = ["blue"];
-      const newGroup = await addGroup(users);
-      setCurrentGroupId(newGroup.InsertedID);
-      setConn(ws);
-      return;
+      try {
+        console.log(username);
+        const users = [username.username];
+        const newGroup = await addGroup(users);
+        setNewGroup(true);
+        setCurrentGroupId(newGroup.InsertedID);
+        setConn(ws);
+        return;
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -108,7 +115,7 @@ export default function Chat() {
       }
     };
     HandleGroups();
-  }, []);
+  }, [newGroup]);
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
@@ -123,38 +130,47 @@ export default function Chat() {
   };
 
   useEffect(() => {
-    if (conn === null) {
-      return;
-    }
-
-    conn.onopen = () => {
-      console.log("Connected Successfully");
-    };
-
-    conn.onmessage = (event) => {
-      const m = JSON.parse(event.data);
-      console.log(m);
-
-      if (m.content === "New User Joined...") {
-        console.log("new user joined");
-      } else if (m.content === "User Disconnected...") {
-        console.log("User Disconnected...");
-      } else if (m.username === "blue") {
-        console.log(m);
-        const newMessage = {
-          Type: "self",
-          Content: m.content,
-        };
-        setMessage([...message, newMessage]);
-      } else {
-        console.log("hello");
-        const newMessage = {
-          Type: "received",
-          Content: m.content,
-        };
-        setMessage([...message, newMessage]);
+    const connection = async () => {
+      if (conn === null) {
+        return;
       }
+
+      const username = "";
+      try {
+        username = await getCurrentUser();
+      } catch (error) {
+        console.log(error);
+      }
+
+      conn.onopen = () => {
+        console.log("Connected Successfully");
+      };
+
+      conn.onmessage = (event) => {
+        const m = JSON.parse(event.data);
+        console.log(m);
+
+        if (m.content === "New User Joined...") {
+          console.log("new user joined");
+        } else if (m.content === "User Disconnected...") {
+          console.log("User Disconnected...");
+        } else if (m.username === username) {
+          console.log(m);
+          const newMessage = {
+            Type: "self",
+            Content: m.content,
+          };
+          setMessage([...message, newMessage]);
+        } else {
+          const newMessage = {
+            Type: "received",
+            Content: m.content,
+          };
+          setMessage([...message, newMessage]);
+        }
+      };
     };
+    connection();
   }, [conn, message]);
 
   return (
@@ -181,7 +197,16 @@ export default function Chat() {
                     <img className="profileImg" src={profile} alt="" />
                     <div className="names">
                       <div className="convo-names">
-                        <h5>{group.Users}</h5>
+                        {group.Users.map((user) => {
+                          if (
+                            group.Users[0] == user &&
+                            group.Users.length == 1
+                          ) {
+                            return <h5>{user} </h5>;
+                          } else {
+                            return <h5>{user}, </h5>;
+                          }
+                        })}
                       </div>
                       <div className="convo">
                         <h6>Heyyyyy!</h6>

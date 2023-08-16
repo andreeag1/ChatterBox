@@ -10,7 +10,7 @@ import (
 	"github.com/andreeag1/chatterbox/configs"
 	"github.com/andreeag1/chatterbox/lib"
 	"github.com/andreeag1/chatterbox/models"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -35,7 +35,7 @@ func NewUser(client *mongo.Client) User {
 func WriteJSON(w http.ResponseWriter, status int, v any) error {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
-	return json.NewEncoder(w).Encode(w)
+	return json.NewEncoder(w).Encode(v)
 }
 
 func (u UserImplementation) AddUser(w http.ResponseWriter, r *http.Request) {
@@ -142,7 +142,7 @@ func (u UserImplementation) GetCurrentUser(w http.ResponseWriter, r *http.Reques
 		if c.Name == "access-token" {
 			fmt.Println(c.Value)
 			tokenString := c.Value
-			token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+			token, err := jwt.ParseWithClaims(tokenString, &lib.AccessTokenClaims{}, func(t *jwt.Token) (interface{}, error) {
 				_, ok := t.Method.(*jwt.SigningMethodHMAC)
 						if !ok {
 							w.WriteHeader(http.StatusUnauthorized)
@@ -156,11 +156,12 @@ func (u UserImplementation) GetCurrentUser(w http.ResponseWriter, r *http.Reques
 				return
 			}
 
-			claims, ok := token.Claims.(jwt.MapClaims)
+			claims, ok := token.Claims.(*lib.AccessTokenClaims)
 				if ok && token.Valid {
-					username := claims["username"].(string)
+					username := claims.Username
 					WriteJSON(w, http.StatusAccepted, username)
 					fmt.Println(username)
+					return
 				}
 			fmt.Println("unable to extract claims")
 			return

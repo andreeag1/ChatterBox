@@ -169,6 +169,30 @@
   flex-direction: column;
 }
 
+.no-chats {
+  background-color: #283038;
+  width: 95%;
+  min-width: 50%;
+  height: 75vh;
+  margin-left: 4rem;
+  padding-top: -1rem;
+  margin-top: 3rem;
+  border-radius: 5%;
+  position: relative;
+  margin-bottom: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.start-chatting {
+  margin-left: 12rem;
+  font-size: 30px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
 .add-user {
   display: flex;
   flex-direction: row;

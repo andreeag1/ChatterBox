@@ -18,6 +18,7 @@ import (
 type Group interface {
 	AddGroup(w http.ResponseWriter, r *http.Request)
 	AddUserToGroup(w http.ResponseWriter, r *http.Request)
+	GetGroups(w http.ResponseWriter, r *http.Request)
 }
 
 type GroupImplementation struct {
@@ -49,7 +50,7 @@ func (g GroupImplementation) AddGroup(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	json.NewEncoder(w).Encode(result)
+	WriteJSON(w, http.StatusAccepted, result)
 	fmt.Println("Inserted 1 group in db with id", result.InsertedID)
 }
 
@@ -82,6 +83,27 @@ func (g GroupImplementation) AddUserToGroup(w http.ResponseWriter, r *http.Reque
 		log.Fatal(err)
 	}
 
+	WriteJSON(w, http.StatusAccepted, results)
 	fmt.Println(results.ModifiedCount, "user was added to group")
+}
 
+func (g GroupImplementation) GetGroups(w http.ResponseWriter, r *http.Request) {
+	groupCollection := g.client.Database("chatterbox").Collection("groups")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cur, err := groupCollection.Find(ctx, bson.M{})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	models := []*models.Group{}
+	if err = cur.All(ctx, &models); err != nil {
+		fmt.Println(err)
+		w.WriteHeader(500);
+	}
+
+	WriteJSON(w, http.StatusAccepted, models)
 }

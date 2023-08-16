@@ -55,6 +55,7 @@ func main() {
 	r.HandleFunc("/message/get", message.GetMessageByUser).Methods("GET")
 	r.HandleFunc("/group/add", group.AddGroup).Methods("POST")
 	r.HandleFunc("/group/user", group.AddUserToGroup).Methods("POST")
+	r.HandleFunc("/group/get", group.GetGroups).Methods("GET")
 	r.HandleFunc("/ws/{username}", func(w http.ResponseWriter, r *http.Request) {
         WsHandler(pool, w, r)})
 

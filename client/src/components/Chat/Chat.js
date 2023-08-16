@@ -18,6 +18,11 @@ import WebSocketProvider, {
   WebsocketContext,
 } from "../../modules/websocket/webSocketProvider";
 import ChatBody from "../ChatBody/ChatBody";
+import {
+  GetAllGroups,
+  addGroup,
+  addUserToGroup,
+} from "../../modules/groups/groupRepository";
 
 const CssTextField = styled(TextField)(({ theme }) => ({
   input: {
@@ -37,12 +42,26 @@ const ColorButton = styled(Button)(({ theme }) => ({
   },
 }));
 
+const NewColorButton = styled(Button)(({ theme }) => ({
+  color: theme.palette.getContrastText("#283038"),
+  color: "black",
+  backgroundColor: "#d6dee1",
+  "&:hover": {
+    backgroundColor: "#283038",
+    color: "white",
+  },
+}));
+
 export default function Chat() {
   const [openProfileDialog, setOpenProfileDialog] = React.useState(false);
   const [message, setMessage] = React.useState([]);
   const [sentText, setSentText] = React.useState("");
   const { setConn } = useContext(WebsocketContext);
   const { conn } = useContext(WebsocketContext);
+  const [newGroup, setNewGroup] = React.useState(false);
+  const [groups, setGroups] = React.useState([]);
+  const [addUser, setAddUser] = React.useState("");
+  const [currentGroupId, setCurrentGroupId] = React.useState("");
 
   const handleClickOpen = () => {
     setOpenProfileDialog(true);
@@ -61,17 +80,45 @@ export default function Chat() {
     }
   };
 
-  const JoinGroup = () => {
+  const AddUserToGroup = async () => {
+    await addUserToGroup(addUser, currentGroupId);
+    setAddUser("");
+  };
+
+  const CreateGroup = async () => {
     const ws = new WebSocket(`ws://localhost:9000/ws/blue`);
     if (ws.OPEN) {
+      setNewGroup(true);
+      const users = ["blue"];
+      const newGroup = await addGroup(users);
+      setCurrentGroupId(newGroup.InsertedID);
       setConn(ws);
       return;
     }
   };
 
+  useEffect(() => {
+    const HandleGroups = async () => {
+      try {
+        const groupResults = await GetAllGroups();
+        console.log(groupResults);
+        setGroups(groupResults);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    HandleGroups();
+  }, []);
+
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       handleSendText();
+    }
+  };
+
+  const handleUserKeyDown = (event) => {
+    if (event.key === "Enter") {
+      AddUserToGroup();
     }
   };
 
@@ -122,78 +169,27 @@ export default function Chat() {
               <h3>Your Chats</h3>
               <ColorButton
                 sx={{ width: "100px", height: "40px", marginTop: "15px" }}
-                onClick={JoinGroup}
+                onClick={CreateGroup}
               >
                 New Chat
               </ColorButton>
             </div>
             <div className="chats-section">
-              <div className="single-chat">
-                <img className="profileImg" src={profile} alt="" />
-                <div className="names">
-                  <div className="convo-names">
-                    <h5>Jane Doe</h5>
+              {groups.map((group) => {
+                return (
+                  <div className="single-chat" key={group.Id}>
+                    <img className="profileImg" src={profile} alt="" />
+                    <div className="names">
+                      <div className="convo-names">
+                        <h5>{group.Users}</h5>
+                      </div>
+                      <div className="convo">
+                        <h6>Heyyyyy!</h6>
+                      </div>
+                    </div>
                   </div>
-                  <div className="convo">
-                    <h6>Heyyyyy!</h6>
-                  </div>
-                </div>
-              </div>
-              <div className="single-chat">
-                <img className="profileImg" src={profile} alt="" />
-                <div className="names">
-                  <div className="convo-names">
-                    <h5>Jane Doe</h5>
-                  </div>
-                  <div className="convo">
-                    <h6>Heyyyyy!</h6>
-                  </div>
-                </div>
-              </div>
-              <div className="single-chat">
-                <img className="profileImg" src={profile} alt="" />
-                <div className="names">
-                  <div className="convo-names">
-                    <h5>Jane Doe</h5>
-                  </div>
-                  <div className="convo">
-                    <h6>Heyyyyy!</h6>
-                  </div>
-                </div>
-              </div>
-              <div className="single-chat">
-                <img className="profileImg" src={profile} alt="" />
-                <div className="names">
-                  <div className="convo-names">
-                    <h5>John Doe</h5>
-                  </div>
-                  <div className="convo">
-                    <h6>Hello!</h6>
-                  </div>
-                </div>
-              </div>
-              <div className="single-chat">
-                <img className="profileImg" src={profile} alt="" />
-                <div className="names">
-                  <div className="convo-names">
-                    <h5>Jill Doe</h5>
-                  </div>
-                  <div className="convo">
-                    <h6>What's up!</h6>
-                  </div>
-                </div>
-              </div>
-              <div className="single-chat">
-                <img className="profileImg" src={profile} alt="" />
-                <div className="names">
-                  <div className="convo-names">
-                    <h5>Job Doe</h5>
-                  </div>
-                  <div className="convo">
-                    <h6>Heyyyyy!</h6>
-                  </div>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
           <div className="right-section">
@@ -217,50 +213,71 @@ export default function Chat() {
                 </DialogActions>
               </Dialog>
             </div>
-            <div className="conversations">
-              <div className="add-user">
-                <CssTextField
-                  fullWidth
-                  variant="outlined"
-                  placeholder="Add user"
-                  sx={{
-                    width: "600px",
-                    marginLeft: "20px",
-                  }}
-                />
-                <div className="add-button">
-                  <IconButton>
-                    <AddCircleIcon
-                      sx={{ color: "white", height: "35px", width: "35px" }}
-                    />
-                  </IconButton>
+            {newGroup ? (
+              <div className="conversations">
+                <div className="add-user">
+                  <CssTextField
+                    value={addUser}
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Add user"
+                    sx={{
+                      width: "600px",
+                      marginLeft: "20px",
+                    }}
+                    onChange={(e) => setAddUser(e.target.value)}
+                    onKeyDown={handleUserKeyDown}
+                  />
+                  <div className="add-button">
+                    <IconButton onClick={addUserToGroup}>
+                      <AddCircleIcon
+                        sx={{ color: "white", height: "35px", width: "35px" }}
+                      />
+                    </IconButton>
+                  </div>
                 </div>
-              </div>
-              <ChatBody message={message} />
+                <ChatBody message={message} />
 
-              <div className="type">
-                <CssTextField
-                  value={sentText}
-                  fullWidth
-                  variant="outlined"
-                  placeholder="Type something..."
-                  sx={{
-                    width: "600px",
-                  }}
-                  className="send-text"
-                  onChange={(e) => setSentText(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
-                <div className="send-button">
-                  <IconButton>
-                    <SendIcon
-                      sx={{ color: "white", size: "medium" }}
-                      onClick={handleSendText}
-                    />
-                  </IconButton>
+                <div className="type">
+                  <CssTextField
+                    value={sentText}
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Type something..."
+                    sx={{
+                      width: "600px",
+                    }}
+                    className="send-text"
+                    onChange={(e) => setSentText(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                  />
+                  <div className="send-button">
+                    <IconButton>
+                      <SendIcon
+                        sx={{ color: "white", size: "medium" }}
+                        onClick={handleSendText}
+                      />
+                    </IconButton>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="no-chats">
+                <div className="start-chatting">
+                  You're ready to start chatting!
+                  <NewColorButton
+                    sx={{
+                      width: "100px",
+                      marginLeft: "150px",
+                      marginTop: "10px",
+                    }}
+                    onClick={CreateGroup}
+                  >
+                    New Chat
+                  </NewColorButton>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

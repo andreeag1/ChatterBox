@@ -7,6 +7,6 @@ import (
 type Message struct {
 	Id 			primitive.ObjectID	`bson:"_id"`
 	From		string				`bson:"from"`
-	To			string				`bson:"to"`
+	GroupId		primitive.ObjectID	`bson:"groupid"`
 	Message		string				`bson:"message"`
 }

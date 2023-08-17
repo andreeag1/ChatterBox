@@ -140,7 +140,6 @@ func (u UserImplementation) GetCurrentUser(w http.ResponseWriter, r *http.Reques
 					var result newObj
 					result.Username = claims.Username
 					WriteJSON(w, http.StatusAccepted, result)
-					fmt.Println(result)
 					return
 				}
 			fmt.Println("unable to extract claims")

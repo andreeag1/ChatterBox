@@ -42,9 +42,10 @@ func main() {
 
 	userRepository := repositories.NewUserRepository(configs.ConnectDB())
 	groupRepository := repositories.NewGroupRepository(configs.ConnectDB())
+	messageRepository := repositories.NewMessageRepository(configs.ConnectDB())
 
 	user := controllers.NewUser(userRepository)
-	message := controllers.NewMessage(configs.ConnectDB())
+	message := controllers.NewMessage(messageRepository)
 	group := controllers.NewGroup(groupRepository)
 
 	configs.ConnectDB()
@@ -57,12 +58,15 @@ func main() {
 	r.HandleFunc("/user/add", user.AddUser).Methods("POST")
 	r.HandleFunc("/user/login", user.Login).Methods("POST")
 	r.HandleFunc("/user/get", user.GetCurrentUser).Methods("GET")
+
 	r.HandleFunc("/message/add", message.AddMessage).Methods("POST")
-	r.HandleFunc("/message/get", message.GetMessageByUser).Methods("GET")
+	r.HandleFunc("/message/{groupId}", message.GetMessageByGroup).Methods("GET")
+
 	r.HandleFunc("/group/add", group.AddGroup).Methods("POST")
 	r.HandleFunc("/group/user", group.AddUserToGroup).Methods("POST")
 	r.HandleFunc("/group/{username}", group.GetGroupsByUsername).Methods("GET")
 	r.HandleFunc("/group/get/{id}", group.GetGroupById).Methods("GET")
+	
 	r.HandleFunc("/ws/create", wshandler.CreateRoom).Methods("POST")
 	r.HandleFunc("/ws/{roomId}", wshandler.JoinRoom).Methods("GET")
 	r.HandleFunc("/ws", wshandler.GetRooms).Methods("GET")

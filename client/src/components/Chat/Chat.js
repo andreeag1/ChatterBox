@@ -26,6 +26,10 @@ import {
 } from "../../modules/groups/groupRepository";
 import { getCurrentUser } from "../../modules/users/userRepository";
 import { CreateRoom } from "../../modules/websocket/webSocketRepository";
+import {
+  AddMessage,
+  GetMessageByGroup,
+} from "../../modules/messages/messageRepository";
 
 const CssTextField = styled(TextField)(({ theme }) => ({
   input: {
@@ -65,6 +69,8 @@ export default function Chat() {
   const [groups, setGroups] = React.useState([]);
   const [addUser, setAddUser] = React.useState("");
   const [currentGroupId, setCurrentGroupId] = React.useState("");
+  const [previousMessages, setPreviousMessages] = React.useState([]);
+  const [changeGroupId, setChangeGroupId] = React.useState("");
 
   const handleClickOpen = () => {
     setOpenProfileDialog(true);
@@ -74,14 +80,36 @@ export default function Chat() {
     setOpenProfileDialog(false);
   };
 
-  const handleSendText = () => {
+  const handleSendText = async () => {
     if (conn !== null) {
       console.log(sentText);
-      conn.send(sentText);
-
-      setSentText("");
+      try {
+        const username = await getCurrentUser();
+        await AddMessage(sentText, username.username, currentGroupId);
+        conn.send(sentText);
+        setSentText("");
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
+
+  useEffect(() => {
+    const getPreviousMessages = async () => {
+      try {
+        if (currentGroupId !== "") {
+          const messages = await GetMessageByGroup(currentGroupId);
+          console.log(messages);
+          setPreviousMessages(messages);
+          console.log(previousMessages);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getPreviousMessages();
+  }, [currentGroupId]);
 
   const AddUser = async () => {
     try {
@@ -98,6 +126,7 @@ export default function Chat() {
       const users = [username.username];
       const newGroup = await AddGroup(users);
       setCurrentGroupId(newGroup.InsertedID);
+      setNewGroup(true);
     } catch (error) {
       console.log(error);
     }
@@ -144,27 +173,37 @@ export default function Chat() {
   useEffect(() => {
     const wsHandler = async () => {
       try {
-        const username = await getCurrentUser();
-        await CreateRoom(currentGroupId);
-        const ws = new WebSocket(
-          `ws://localhost:9000/ws/${currentGroupId}?username=${username.username}`
-        );
-        if (ws.OPEN) {
-          try {
-            setNewGroup(true);
-            setConn(ws);
-            return;
-          } catch (error) {
-            console.log(error);
+        if (changeGroupId !== "") {
+          var messageArray = [];
+          message.map((singleMessage) => {
+            if (singleMessage.Group !== currentGroupId) {
+              messageArray.push(singleMessage);
+            }
+          });
+          setMessage(messageArray);
+          setCurrentGroupId(changeGroupId);
+          const username = await getCurrentUser();
+          await CreateRoom(currentGroupId);
+          const ws = new WebSocket(
+            `ws://localhost:9000/ws/${currentGroupId}?username=${username.username}`
+          );
+          if (ws.OPEN) {
+            try {
+              setNewGroup(true);
+              setConn(ws);
+              return;
+            } catch (error) {
+              console.log(error);
+            }
           }
+          OpenGroupChat();
         }
-        OpenGroupChat();
       } catch (error) {
         console.log(error);
       }
     };
     wsHandler();
-  }, [currentGroupId]);
+  }, [changeGroupId]);
 
   useEffect(() => {
     const connection = async () => {
@@ -179,6 +218,10 @@ export default function Chat() {
       } catch (error) {
         console.log(error);
       }
+
+      conn.onclose = () => {
+        console.log("User Disconnected");
+      };
 
       conn.onopen = () => {
         console.log("Connected Successfully");
@@ -197,12 +240,14 @@ export default function Chat() {
           const newMessage = {
             Type: "self",
             Content: m.content,
+            Group: currentGroupId,
           };
           setMessage([...message, newMessage]);
         } else {
           const newMessage = {
             Type: "received",
             Content: m.content,
+            Group: currentGroupId,
           };
           setMessage([...message, newMessage]);
         }
@@ -234,7 +279,7 @@ export default function Chat() {
                   <div
                     className="single-chat"
                     key={group.Id}
-                    onClick={(e) => setCurrentGroupId(group.Id)}
+                    onClick={(e) => setChangeGroupId(group.Id)}
                   >
                     <img className="profileImg" src={profile} alt="" />
                     <div className="names">
@@ -307,7 +352,11 @@ export default function Chat() {
                     </IconButton>
                   </div>
                 </div>
-                <ChatBody message={message} />
+                <ChatBody
+                  message={message}
+                  previous={previousMessages}
+                  group={currentGroupId}
+                />
 
                 <div className="type">
                   <CssTextField

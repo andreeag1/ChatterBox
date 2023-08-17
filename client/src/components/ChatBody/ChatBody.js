@@ -11,8 +11,11 @@ import {
   DialogTitle,
 } from "@mui/material";
 import profile from "../../pictures/profile.png";
+import { getCurrentUser } from "../../modules/users/userRepository";
 
-export default function ChatBody({ message }) {
+export default function ChatBody({ message, previous, group }) {
+  const [username, setUsername] = React.useState("");
+
   const ref = useRef(null);
 
   const scrollToBottom = () => {
@@ -25,29 +28,63 @@ export default function ChatBody({ message }) {
   };
 
   useEffect(() => {
+    const getUsername = async () => {
+      try {
+        const username = await getCurrentUser();
+        setUsername(username.username);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getUsername();
+  }, [previous]);
+
+  useEffect(() => {
     scrollToBottom();
   }, [message]);
 
   return (
     <div className="texts" ref={ref}>
-      {message.map((newMessage) => {
-        if (newMessage.Type === "received") {
+      {previous.map((newMessage) => {
+        if (newMessage.From !== username) {
           return (
             <div className="other-user">
               <img className="otherUserProfileImg" src={profile} alt="" />
-              <div className="received-text">{newMessage.Content}</div>
+              <div className="received-text">{newMessage.Message}</div>
             </div>
           );
-        } else if (newMessage.Type === "self") {
+        } else if (newMessage.From === username) {
           return (
             <div className="current-user">
-              <div className="sent-text">{newMessage.Content}</div>
+              <div className="sent-text">{newMessage.Message}</div>
               <img className="otherUserProfileImg" src={profile} alt="" />
             </div>
           );
         } else {
           console.log("hello");
           return <></>;
+        }
+      })}
+      {message.map((newMessage) => {
+        if (newMessage.Group === group) {
+          if (newMessage.Type === "received") {
+            return (
+              <div className="other-user">
+                <img className="otherUserProfileImg" src={profile} alt="" />
+                <div className="received-text">{newMessage.Content}</div>
+              </div>
+            );
+          } else if (newMessage.Type === "self") {
+            return (
+              <div className="current-user">
+                <div className="sent-text">{newMessage.Content}</div>
+                <img className="otherUserProfileImg" src={profile} alt="" />
+              </div>
+            );
+          } else {
+            console.log("hello");
+            return <></>;
+          }
         }
       })}
     </div>

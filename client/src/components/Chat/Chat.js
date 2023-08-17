@@ -25,6 +25,7 @@ import {
   GetGroupsByUsername,
 } from "../../modules/groups/groupRepository";
 import { getCurrentUser } from "../../modules/users/userRepository";
+import { CreateRoom } from "../../modules/websocket/webSocketRepository";
 
 const CssTextField = styled(TextField)(({ theme }) => ({
   input: {
@@ -92,20 +93,13 @@ export default function Chat() {
   };
 
   const CreateGroup = async () => {
-    const username = await getCurrentUser();
-    const ws = new WebSocket(`ws://localhost:9000/ws/${username.username}`);
-    if (ws.OPEN) {
-      try {
-        console.log(username);
-        const users = [username.username];
-        const newGroup = await AddGroup(users);
-        setNewGroup(true);
-        setCurrentGroupId(newGroup.InsertedID);
-        setConn(ws);
-        return;
-      } catch (error) {
-        console.log(error);
-      }
+    try {
+      const username = await getCurrentUser();
+      const users = [username.username];
+      const newGroup = await AddGroup(users);
+      setCurrentGroupId(newGroup.InsertedID);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -146,6 +140,31 @@ export default function Chat() {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    const wsHandler = async () => {
+      try {
+        const username = await getCurrentUser();
+        await CreateRoom(currentGroupId);
+        const ws = new WebSocket(
+          `ws://localhost:9000/ws/${currentGroupId}?username=${username.username}`
+        );
+        if (ws.OPEN) {
+          try {
+            setNewGroup(true);
+            setConn(ws);
+            return;
+          } catch (error) {
+            console.log(error);
+          }
+        }
+        OpenGroupChat();
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    wsHandler();
+  }, [currentGroupId]);
 
   useEffect(() => {
     const connection = async () => {
@@ -215,8 +234,7 @@ export default function Chat() {
                   <div
                     className="single-chat"
                     key={group.Id}
-                    onMouseEnter={(e) => setCurrentGroupId(group.Id)}
-                    onClick={OpenGroupChat}
+                    onClick={(e) => setCurrentGroupId(group.Id)}
                   >
                     <img className="profileImg" src={profile} alt="" />
                     <div className="names">

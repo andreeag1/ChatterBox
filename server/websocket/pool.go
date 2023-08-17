@@ -2,7 +2,13 @@ package websocket
 
 import "fmt"
 
+type Room struct {
+	ID      string             `json:"id"`
+	Clients map[string]*Client `json:"clients"`
+}
+
 type Pool struct {
+    Rooms      map[string]*Room
     Register   chan *Client
     Unregister chan *Client
     Clients    map[*Client]bool
@@ -11,6 +17,7 @@ type Pool struct {
 
 func NewPool() *Pool {
     return &Pool{
+        Rooms:      make(map[string]*Room),
         Register:   make(chan *Client),
         Unregister: make(chan *Client),
         Clients:    make(map[*Client]bool),
@@ -22,26 +29,38 @@ func (pool *Pool) Start() {
     for {
         select {
         case client := <-pool.Register:
-            pool.Clients[client] = true
-            fmt.Println("Size of Connection Pool: ", len(pool.Clients))
-            for client := range pool.Clients {
-                fmt.Println(client)
-                client.Conn.WriteJSON("New User Joined...")
+            if _, ok := pool.Rooms[client.RoomID]; ok {
+                newRoom := pool.Rooms[client.RoomID]
+
+                if _, ok := newRoom.Clients[client.Username]; !ok {
+                    newRoom.Clients[client.Username] = client
+                }
             }
-            break
         case client := <-pool.Unregister:
-            delete(pool.Clients, client)
-            fmt.Println("Size of Connection Pool: ", len(pool.Clients))
-            for client := range pool.Clients {
-                client.Conn.WriteJSON("User Disconnected...")
+            if _, ok := pool.Rooms[client.RoomID]; ok {
+                if _, ok := pool.Rooms[client.RoomID].Clients[client.ID]; ok {
+                    if len(pool.Rooms[client.RoomID].Clients) != 0 {
+                        pool.Broadcast <- &Message{
+                            Content: "User disconnected",
+                            RoomId: client.RoomID,
+                            Username: client.Username,
+                        }
+                    } 
+                    delete(pool.Rooms[client.RoomID].Clients, client.ID)
+                    close(client.Message)
+                }
             }
-            break
         case message := <-pool.Broadcast:
-            fmt.Println("Sending message to all clients in Pool")
-            for client := range pool.Clients {
-                if err := client.Conn.WriteJSON(message); err != nil {
-                    fmt.Println(err)
-                    return
+            fmt.Println("message exists")
+            if _, ok := pool.Rooms[message.RoomId]; ok {
+                fmt.Println("room exists")
+                for _, cl := range pool.Rooms[message.RoomId].Clients {
+                    if err := cl.Conn.WriteJSON(message); err != nil {
+                        fmt.Println(err)
+                        return
+                    }
+                    fmt.Println("Sending message to all clients in Pool")
+                    cl.Message <- message
                 }
             }
         }

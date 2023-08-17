@@ -13,30 +13,32 @@ import (
 	"github.com/rs/cors"
 )
 
-func WsHandler(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
-    fmt.Println("WebSocket Endpoint Hit")
-    conn, err := websocket.Upgrade(w, r)
-    if err != nil {
-        fmt.Fprintf(w, "%+v\n", err)
-    }
+// func WsHandler(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
+//     fmt.Println("WebSocket Endpoint Hit")
+//     conn, err := websocket.Upgrade(w, r)
+//     if err != nil {
+//         fmt.Fprintf(w, "%+v\n", err)
+//     }
 
-	username := mux.Vars(r)["username"]
+// 	username := mux.Vars(r)["username"]
 
-    client := &websocket.Client{
-        Conn: conn,
-        Pool: pool,
-		Username: username,
-    }
+//     client := &websocket.Client{
+//         Conn: conn,
+//         Pool: pool,
+// 		Username: username,
+//     }
 
-    pool.Register <- client
-    client.Read()
-}
+//     pool.Register <- client
+//     client.Read()
+// }
 
 func main() {
 	r := mux.NewRouter()
 
 	pool := websocket.NewPool()
 	go pool.Start()
+
+	wshandler := websocket.NewHandler(pool)
 
 	userRepository := repositories.NewUserRepository(configs.ConnectDB())
 	groupRepository := repositories.NewGroupRepository(configs.ConnectDB())
@@ -61,8 +63,9 @@ func main() {
 	r.HandleFunc("/group/user", group.AddUserToGroup).Methods("POST")
 	r.HandleFunc("/group/{username}", group.GetGroupsByUsername).Methods("GET")
 	r.HandleFunc("/group/get/{id}", group.GetGroupById).Methods("GET")
-	r.HandleFunc("/ws/{username}", func(w http.ResponseWriter, r *http.Request) {
-        WsHandler(pool, w, r)})
+	r.HandleFunc("/ws/create", wshandler.CreateRoom).Methods("POST")
+	r.HandleFunc("/ws/{roomId}", wshandler.JoinRoom).Methods("GET")
+	r.HandleFunc("/ws", wshandler.GetRooms).Methods("GET")
 
 	handler := c.Handler(r)
 

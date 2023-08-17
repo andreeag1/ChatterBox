@@ -64,8 +64,6 @@ func (g GroupImplementation) GetGroupsByUsername(w http.ResponseWriter, r *http.
 	WriteJSON(w, http.StatusAccepted, models)
 }
 
-
-
 func (g GroupImplementation) GetGroupById(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 

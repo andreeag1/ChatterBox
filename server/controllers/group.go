@@ -15,6 +15,7 @@ type Group interface {
 	AddGroup(w http.ResponseWriter, r *http.Request)
 	AddUserToGroup(w http.ResponseWriter, r *http.Request)
 	GetGroupsByUsername(w http.ResponseWriter, r *http.Request)
+	GetGroupById(w http.ResponseWriter, r *http.Request)
 }
 
 type GroupImplementation struct {
@@ -62,3 +63,24 @@ func (g GroupImplementation) GetGroupsByUsername(w http.ResponseWriter, r *http.
 
 	WriteJSON(w, http.StatusAccepted, models)
 }
+
+
+
+func (g GroupImplementation) GetGroupById(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	models, err := g.repository.FindGroupById(r.Context(), objID)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	WriteJSON(w, http.StatusAccepted, models)
+}
+
+

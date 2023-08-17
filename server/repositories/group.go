@@ -15,6 +15,7 @@ type GroupRepository interface {
 	InsertGroup(ctx context.Context, users []string) *mongo.InsertOneResult
 	AddUserToGroup(ctx context.Context, groupId primitive.ObjectID, username string) *mongo.UpdateResult
 	FindGroupsByUsername(ctx context.Context, username string) ([]*models.Group, error)
+	FindGroupById(ctx context.Context, id primitive.ObjectID) (*models.Group, error)
 }
 
 type GroupRepositoryImplementation struct {
@@ -82,4 +83,20 @@ func (g GroupRepositoryImplementation) FindGroupsByUsername(ctx context.Context,
 	}
 
 	return models, nil
+}
+
+func (g GroupRepositoryImplementation) FindGroupById(ctx context.Context, id primitive.ObjectID) (*models.Group, error) {
+	userCollection := g.client.Database("chatterbox").Collection("groups")
+
+	filter := bson.M{"_id": id}
+
+	result := models.Group{}
+	err := userCollection.FindOne(ctx, filter).Decode(&result)
+
+	if err == mongo.ErrNoDocuments {
+		fmt.Println(err, "This group does not exist")
+		return nil, err
+	} 
+
+	return &result, nil
 }

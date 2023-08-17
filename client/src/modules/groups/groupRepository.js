@@ -1,4 +1,4 @@
-export const addGroup = async (users) => {
+export const AddGroup = async (users) => {
   try {
     const res = await fetch(`http://localhost:9000/group/add`, {
       method: "POST",
@@ -17,7 +17,7 @@ export const addGroup = async (users) => {
   }
 };
 
-export const addUserToGroup = async (username, group) => {
+export const AddUserToGroup = async (username, group) => {
   try {
     const res = await fetch(`http://localhost:9000/group/user`, {
       method: "POST",
@@ -46,5 +46,16 @@ export const GetGroupsByUsername = async (username) => {
   });
   const data = await res.json();
   console.log(data);
+  return data;
+};
+
+export const GetGroupById = async (id) => {
+  const res = await fetch(`http://localhost:9000/group/get/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const data = await res.json();
   return data;
 };

@@ -60,6 +60,7 @@ func main() {
 	r.HandleFunc("/group/add", group.AddGroup).Methods("POST")
 	r.HandleFunc("/group/user", group.AddUserToGroup).Methods("POST")
 	r.HandleFunc("/group/{username}", group.GetGroupsByUsername).Methods("GET")
+	r.HandleFunc("/group/get/{id}", group.GetGroupById).Methods("GET")
 	r.HandleFunc("/ws/{username}", func(w http.ResponseWriter, r *http.Request) {
         WsHandler(pool, w, r)})
 

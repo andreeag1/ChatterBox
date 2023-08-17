@@ -19,9 +19,10 @@ import WebSocketProvider, {
 } from "../../modules/websocket/webSocketProvider";
 import ChatBody from "../ChatBody/ChatBody";
 import {
+  AddGroup,
+  AddUserToGroup,
+  GetGroupById,
   GetGroupsByUsername,
-  addGroup,
-  addUserToGroup,
 } from "../../modules/groups/groupRepository";
 import { getCurrentUser } from "../../modules/users/userRepository";
 
@@ -81,9 +82,13 @@ export default function Chat() {
     }
   };
 
-  const AddUserToGroup = async () => {
-    await addUserToGroup(addUser, currentGroupId);
-    setAddUser("");
+  const AddUser = async () => {
+    try {
+      await AddUserToGroup(addUser, currentGroupId);
+      setAddUser("");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const CreateGroup = async () => {
@@ -93,7 +98,7 @@ export default function Chat() {
       try {
         console.log(username);
         const users = [username.username];
-        const newGroup = await addGroup(users);
+        const newGroup = await AddGroup(users);
         setNewGroup(true);
         setCurrentGroupId(newGroup.InsertedID);
         setConn(ws);
@@ -118,7 +123,7 @@ export default function Chat() {
       }
     };
     HandleGroups();
-  }, [newGroup]);
+  }, [newGroup, addUser]);
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
@@ -128,7 +133,17 @@ export default function Chat() {
 
   const handleUserKeyDown = (event) => {
     if (event.key === "Enter") {
-      AddUserToGroup();
+      AddUser();
+    }
+  };
+
+  const OpenGroupChat = async () => {
+    try {
+      const newGroups = await GetGroupById(currentGroupId);
+      setNewGroup(true);
+      console.log(newGroups);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -197,7 +212,12 @@ export default function Chat() {
             <div className="chats-section">
               {groups.map((group) => {
                 return (
-                  <div className="single-chat" key={group.Id}>
+                  <div
+                    className="single-chat"
+                    key={group.Id}
+                    onMouseEnter={(e) => setCurrentGroupId(group.Id)}
+                    onClick={OpenGroupChat}
+                  >
                     <img className="profileImg" src={profile} alt="" />
                     <div className="names">
                       <div className="convo-names">
@@ -207,6 +227,10 @@ export default function Chat() {
                             group.Users.length == 1
                           ) {
                             return <h5>{user} </h5>;
+                          } else if (
+                            group.Users[group.Users.length - 1] == user
+                          ) {
+                            return <h5>{user}</h5>;
                           } else {
                             return <h5>{user}, </h5>;
                           }
@@ -258,7 +282,7 @@ export default function Chat() {
                     onKeyDown={handleUserKeyDown}
                   />
                   <div className="add-button">
-                    <IconButton onClick={addUserToGroup}>
+                    <IconButton onClick={AddUser}>
                       <AddCircleIcon
                         sx={{ color: "white", height: "35px", width: "35px" }}
                       />

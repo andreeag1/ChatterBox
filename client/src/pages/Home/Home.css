@@ -2,6 +2,7 @@
   background-color: #181012;
   padding-bottom: 24px;
   background-position: center;
+  min-width: 7%;
   width: 100%;
   overflow-y: hidden;
 }

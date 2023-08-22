@@ -70,7 +70,11 @@ export default function ChatBody({ message, previous, group }) {
           if (newMessage.Type === "received") {
             return (
               <div className="other-user">
-                <img className="otherUserProfileImg" src={profile} alt="" />
+                <img
+                  className="otherUserProfileImg"
+                  src={newMessage.Image}
+                  alt=""
+                />
                 <div className="received-text">{newMessage.Content}</div>
               </div>
             );
@@ -78,7 +82,11 @@ export default function ChatBody({ message, previous, group }) {
             return (
               <div className="current-user">
                 <div className="sent-text">{newMessage.Content}</div>
-                <img className="otherUserProfileImg" src={profile} alt="" />
+                <img
+                  className="otherUserProfileImg"
+                  src={newMessage.Image}
+                  alt=""
+                />
               </div>
             );
           } else {

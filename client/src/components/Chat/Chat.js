@@ -30,6 +30,8 @@ import {
   AddMessage,
   GetMessageByGroup,
 } from "../../modules/messages/messageRepository";
+import { storage } from "../../firebase.js";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const CssTextField = styled(TextField)(({ theme }) => ({
   input: {
@@ -71,6 +73,23 @@ export default function Chat() {
   const [currentGroupId, setCurrentGroupId] = React.useState("");
   const [previousMessages, setPreviousMessages] = React.useState([]);
   const [changeGroupId, setChangeGroupId] = React.useState("");
+  const [url, setUrl] = React.useState(null);
+  const [image, setImage] = React.useState(null);
+
+  useEffect(() => {
+    const handleProfilePic = async () => {
+      const username = await getCurrentUser();
+      const imageRef = ref(storage, username.username);
+      getDownloadURL(imageRef)
+        .then((url) => {
+          setUrl(url);
+        })
+        .catch((error) => {
+          setUrl(profile);
+        });
+    };
+    handleProfilePic();
+  });
 
   const handleClickOpen = () => {
     setOpenProfileDialog(true);
@@ -78,6 +97,28 @@ export default function Chat() {
 
   const handleClose = () => {
     setOpenProfileDialog(false);
+  };
+
+  const handleSubmitProfile = async () => {
+    setOpenProfileDialog(false);
+    const username = await getCurrentUser();
+    const imageRef = ref(storage, username.username);
+    uploadBytes(imageRef, image)
+      .then(() => {
+        getDownloadURL(imageRef)
+          .then((url) => {
+            setUrl(url);
+          })
+          .catch((error) => {});
+        setImage(null);
+      })
+      .catch((error) => {});
+  };
+
+  const handleProfileChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
   };
 
   const handleSendText = async () => {
@@ -237,17 +278,37 @@ export default function Chat() {
           console.log("User Disconnected...");
         } else if (m.username === username.username) {
           console.log(m);
+          const imageRef = ref(storage, m.username);
+          var profilePic = "";
+          getDownloadURL(imageRef)
+            .then((url) => {
+              profilePic = url;
+            })
+            .catch((error) => {
+              profilePic = profile;
+            });
           const newMessage = {
             Type: "self",
             Content: m.content,
             Group: currentGroupId,
+            Image: profilePic,
           };
           setMessage([...message, newMessage]);
         } else {
+          const imageRef = ref(storage, m.username);
+          var profilePic = "";
+          getDownloadURL(imageRef)
+            .then((url) => {
+              profilePic = url;
+            })
+            .catch((error) => {
+              profilePic = profile;
+            });
           const newMessage = {
             Type: "received",
             Content: m.content,
             Group: currentGroupId,
+            Image: profilePic,
           };
           setMessage([...message, newMessage]);
         }
@@ -266,12 +327,9 @@ export default function Chat() {
           <div className="chats">
             <div className="your-chats">
               <h3>Your Chats</h3>
-              <ColorButton
-                sx={{ width: "100px", height: "40px", marginTop: "15px" }}
-                onClick={CreateGroup}
-              >
-                New Chat
-              </ColorButton>
+              <div className="your-chats-button">
+                <ColorButton onClick={CreateGroup}>New Chat</ColorButton>
+              </div>
             </div>
             <div className="chats-section">
               {groups.map((group) => {
@@ -312,18 +370,18 @@ export default function Chat() {
             <div className="profile-section">
               <img
                 className="myProfileImg"
-                src={profile}
+                src={url}
                 alt=""
                 onClick={handleClickOpen}
               />
               <Dialog open={openProfileDialog} onClose={handleClose}>
                 <DialogTitle>Set Profile Image</DialogTitle>
                 <DialogContent>
-                  <input type="file" />
+                  <input type="file" onChange={handleProfileChange} />
                 </DialogContent>
                 <DialogActions>
                   <Button onClick={handleClose}>Close</Button>
-                  <Button onClick={handleClose} autoFocus>
+                  <Button onClick={handleSubmitProfile} autoFocus>
                     Set image
                   </Button>
                 </DialogActions>

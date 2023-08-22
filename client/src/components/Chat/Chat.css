@@ -14,9 +14,8 @@
 
 .box {
   width: 90%;
-  min-width: 20%;
+  min-height: 100%;
   height: 90vh;
-  max-height: 200%;
   margin-top: 10px;
   margin-left: 50px;
   margin-right: 50px;
@@ -57,6 +56,7 @@
 }
 
 .chats-section {
+  width: 330px;
   height: 650px;
   margin-top: 0px;
   justify-content: flex-start;
@@ -70,7 +70,8 @@
 
 .single-chat {
   height: 100px;
-  width: 300px;
+  width: 90%;
+  min-width: 30%;
   margin-bottom: 2rem;
   position: relative;
   color: black;
@@ -159,9 +160,17 @@
   flex-direction: column;
   flex-wrap: nowrap;
   width: 800px;
+  min-width: 10vh;
+}
+
+.your-chats-button {
+  width: 100px;
+  height: 40px;
+  margin-top: 15px;
 }
 
 .profile-section {
+  display: flex;
   height: 20px;
   margin-left: 47rem;
   margin-top: 0.3rem;
@@ -170,7 +179,7 @@
 .conversations {
   background-color: #283038;
   width: 95%;
-  min-width: 50%;
+  min-width: 40%;
   height: 75vh;
   margin-left: 4rem;
   padding-top: -1rem;
@@ -269,5 +278,111 @@
 @media (max-width: 1247px) {
   .chats {
     margin-top: 0rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .chats {
+    margin-right: 4rem;
+  }
+
+  .your-chats-button {
+    width: 100px;
+    height: 40px;
+    margin-top: 15px;
+    margin-right: 2rem;
+  }
+}
+
+@media (max-width: 1388px) {
+  .box {
+    width: 90%;
+    height: 180vh;
+    margin-top: 10px;
+    margin-left: 50px;
+    margin-right: 50px;
+    justify-content: center;
+    background-color: #d6dee1;
+    align-items: center;
+    display: flex;
+    border-radius: 25px;
+  }
+
+  .box-two {
+    width: 96%;
+    height: 175vh;
+    max-height: fit-content;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    background-color: #b9c3cd;
+    position: relative;
+    align-items: center;
+    border-radius: 25px;
+    justify-content: center;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  }
+
+  .chats {
+    padding-left: 4rem;
+    margin-top: -50px;
+    font-family: Caprasimo;
+    font-size: 20px;
+  }
+
+  .right-section {
+    margin-right: 6rem;
+  }
+
+  .profile-section {
+    height: 20px;
+    display: flex;
+    position: relative;
+    width: 95%;
+    min-width: 10%;
+    margin-left: 5rem;
+    margin-top: -3rem;
+  }
+
+  .conversations {
+    background-color: #283038;
+    width: 95%;
+    min-height: 30%;
+    height: 75vh;
+    margin-left: 4rem;
+    padding-top: -1rem;
+    margin-top: 3rem;
+    border-radius: 5%;
+    position: relative;
+    margin-bottom: 200px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .type {
+    display: flex;
+    flex-direction: row;
+    margin-left: 2rem;
+    position: absolute;
+    bottom: 5px;
+    width: 85%;
+  }
+
+  .send-button {
+    padding-left: 0rem;
+    margin-right: -0rem;
+  }
+
+  .add-user {
+    display: flex;
+    flex-direction: row;
+    height: 0px;
+    padding-top: 0.2rem;
+    padding-left: 0rem;
+  }
+
+  .add-button {
+    margin-left: 0rem;
+    width: 40px;
   }
 }

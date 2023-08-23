@@ -50,7 +50,7 @@ export default function ChatBody({ message, previous, group }) {
           return (
             <div className="other-user-section">
               <div className="other-username">
-                <h8>{newMessage.From}</h8>
+                <h7>{newMessage.From}</h7>
               </div>
               <div className="other-user">
                 <img

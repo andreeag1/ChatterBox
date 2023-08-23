@@ -9,7 +9,6 @@ export const AddGroup = async (users) => {
     }),
   });
   const data = await res.json();
-  console.log(data);
   return data;
 };
 
@@ -25,7 +24,6 @@ export const AddUserToGroup = async (username, group) => {
     }),
   });
   const data = await res.json();
-  console.log(data);
   return 200;
 };
 
@@ -37,7 +35,6 @@ export const GetGroupsByUsername = async (username) => {
     },
   });
   const data = await res.json();
-  console.log(data);
   return data;
 };
 

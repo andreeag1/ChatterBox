@@ -12,7 +12,6 @@ export const AddMessage = async (message, username, groupId, picture) => {
     }),
   });
   const data = await res.json();
-  console.log(data);
   return data;
 };
 
@@ -24,6 +23,5 @@ export const GetMessageByGroup = async (groupId) => {
     },
   });
   const data = await res.json();
-  console.log(data);
   return data;
 };

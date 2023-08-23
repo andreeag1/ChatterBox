@@ -1,22 +1,11 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect } from "react";
 import "./Chat.css";
 import { styled } from "@mui/material/styles";
-import {
-  Button,
-  IconButton,
-  TextField,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-} from "@mui/material";
+import { Button, IconButton, TextField } from "@mui/material";
 import profile from "../../pictures/profile.png";
-import { makeStyles } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import WebSocketProvider, {
-  WebsocketContext,
-} from "../../modules/websocket/webSocketProvider";
+import { WebsocketContext } from "../../modules/websocket/webSocketProvider";
 import ChatBody from "../ChatBody/ChatBody";
 import {
   AddGroup,
@@ -31,7 +20,8 @@ import {
   GetMessageByGroup,
 } from "../../modules/messages/messageRepository";
 import { storage } from "../../firebase.js";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, getDownloadURL } from "firebase/storage";
+import Profile from "../Profile/Profile";
 
 const CssTextField = styled(TextField)(({ theme }) => ({
   input: {
@@ -62,7 +52,6 @@ const NewColorButton = styled(Button)(({ theme }) => ({
 }));
 
 export default function Chat() {
-  const [openProfileDialog, setOpenProfileDialog] = React.useState(false);
   const [message, setMessage] = React.useState([]);
   const [sentText, setSentText] = React.useState("");
   const { setConn } = useContext(WebsocketContext);
@@ -74,53 +63,7 @@ export default function Chat() {
   const [previousMessages, setPreviousMessages] = React.useState([]);
   const [changeGroupId, setChangeGroupId] = React.useState("");
   const [url, setUrl] = React.useState(null);
-  const [image, setImage] = React.useState(null);
   const [usernameMap, setUsernameMap] = React.useState(new Map());
-
-  useEffect(() => {
-    const handleProfilePic = async () => {
-      const username = await getCurrentUser();
-      const imageRef = ref(storage, username.username);
-      getDownloadURL(imageRef)
-        .then((url) => {
-          setUrl(url);
-        })
-        .catch((error) => {
-          setUrl(profile);
-        });
-    };
-    handleProfilePic();
-  });
-
-  const handleClickOpen = () => {
-    setOpenProfileDialog(true);
-  };
-
-  const handleClose = () => {
-    setOpenProfileDialog(false);
-  };
-
-  const handleSubmitProfile = async () => {
-    setOpenProfileDialog(false);
-    const username = await getCurrentUser();
-    const imageRef = ref(storage, username.username);
-    uploadBytes(imageRef, image)
-      .then(() => {
-        getDownloadURL(imageRef)
-          .then((url) => {
-            setUrl(url);
-          })
-          .catch((error) => {});
-        setImage(null);
-      })
-      .catch((error) => {});
-  };
-
-  const handleProfileChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
 
   const handleSendText = async () => {
     if (conn !== null) {
@@ -185,14 +128,6 @@ export default function Chat() {
       const username = await getCurrentUser();
       const users = [username.username];
       const newGroup = await AddGroup(users);
-      const imageRef = ref(storage, username.username);
-      getDownloadURL(imageRef)
-        .then(async (url) => {
-          setUrl(url);
-        })
-        .catch(async (error) => {
-          setUrl(profile);
-        });
       setCurrentGroupId(newGroup.InsertedID);
       setNewGroup(true);
     } catch (error) {
@@ -203,7 +138,6 @@ export default function Chat() {
   useEffect(() => {
     const HandleGroups = async () => {
       const username = await getCurrentUser();
-
       try {
         const groupResults = await GetGroupsByUsername(username.username);
         setGroups(groupResults);
@@ -249,23 +183,18 @@ export default function Chat() {
           setCurrentGroupId(changeGroupId);
         }
         const group = await GetGroupById(currentGroupId);
-        console.log(group);
         const usernameProfiles = new Map();
         group.Users.map((user) => {
           const imageRef = ref(storage, user);
           getDownloadURL(imageRef)
             .then((url) => {
-              console.log(url);
               usernameProfiles.set(user, url);
             })
             .catch((error) => {
-              console.log(profile);
               usernameProfiles.set(user, profile);
             });
         });
         setUsernameMap(usernameProfiles);
-        console.log("map");
-        console.log(usernameProfiles);
         const username = await getCurrentUser();
         await CreateRoom(currentGroupId);
         const ws = new WebSocket(
@@ -389,26 +318,7 @@ export default function Chat() {
             </div>
           </div>
           <div className="right-section">
-            <div className="profile-section">
-              <img
-                className="myProfileImg"
-                src={url}
-                alt=""
-                onClick={handleClickOpen}
-              />
-              <Dialog open={openProfileDialog} onClose={handleClose}>
-                <DialogTitle>Set Profile Image</DialogTitle>
-                <DialogContent>
-                  <input type="file" onChange={handleProfileChange} />
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleClose}>Close</Button>
-                  <Button onClick={handleSubmitProfile} autoFocus>
-                    Set image
-                  </Button>
-                </DialogActions>
-              </Dialog>
-            </div>
+            <Profile />
             {newGroup ? (
               <div className="conversations">
                 <div className="add-user">

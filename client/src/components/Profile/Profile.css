@@ -1,0 +1,25 @@
+.profile-section {
+  display: flex;
+  height: 20px;
+  margin-left: 47rem;
+  margin-top: 0.3rem;
+}
+
+.myProfileImg {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+@media (max-width: 1388px) {
+  .profile-section {
+    height: 20px;
+    display: flex;
+    position: relative;
+    width: 95%;
+    min-width: 10%;
+    margin-left: 5rem;
+    margin-top: -3rem;
+  }
+}

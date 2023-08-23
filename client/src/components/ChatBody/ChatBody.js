@@ -48,16 +48,29 @@ export default function ChatBody({ message, previous, group }) {
       {previous.map((newMessage) => {
         if (newMessage.From !== username) {
           return (
-            <div className="other-user">
-              <img className="otherUserProfileImg" src={profile} alt="" />
-              <div className="received-text">{newMessage.Message}</div>
+            <div className="other-user-section">
+              <div className="other-username">
+                <h8>{newMessage.From}</h8>
+              </div>
+              <div className="other-user">
+                <img
+                  className="otherUserProfileImg"
+                  src={newMessage.Picture}
+                  alt=""
+                />
+                <div className="received-text">{newMessage.Message}</div>
+              </div>
             </div>
           );
         } else if (newMessage.From === username) {
           return (
             <div className="current-user">
               <div className="sent-text">{newMessage.Message}</div>
-              <img className="otherUserProfileImg" src={profile} alt="" />
+              <img
+                className="otherUserProfileImg"
+                src={newMessage.Picture}
+                alt=""
+              />
             </div>
           );
         } else {
@@ -68,6 +81,7 @@ export default function ChatBody({ message, previous, group }) {
       {message.map((newMessage) => {
         if (newMessage.Group === group) {
           if (newMessage.Type === "received") {
+            console.log(newMessage.Image);
             return (
               <div className="other-user">
                 <img
@@ -79,6 +93,7 @@ export default function ChatBody({ message, previous, group }) {
               </div>
             );
           } else if (newMessage.Type === "self") {
+            console.log(newMessage.Image);
             return (
               <div className="current-user">
                 <div className="sent-text">{newMessage.Content}</div>

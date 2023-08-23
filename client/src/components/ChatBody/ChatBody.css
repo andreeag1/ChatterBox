@@ -8,12 +8,23 @@
   overscroll-behavior: contain;
 }
 
-.other-user {
+.other-user-section {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   margin-top: 2rem;
   margin-left: 0.9rem;
   margin-bottom: 2rem;
+}
+
+.other-username {
+  color: #e2dce6;
+  font-size: 15px;
+  padding-left: 4.5rem;
+}
+
+.other-user {
+  display: flex;
+  flex-direction: row;
 }
 
 .received-text {

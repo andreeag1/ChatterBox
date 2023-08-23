@@ -75,6 +75,7 @@ export default function Chat() {
   const [changeGroupId, setChangeGroupId] = React.useState("");
   const [url, setUrl] = React.useState(null);
   const [image, setImage] = React.useState(null);
+  const [usernameMap, setUsernameMap] = React.useState(new Map());
 
   useEffect(() => {
     const handleProfilePic = async () => {
@@ -126,7 +127,27 @@ export default function Chat() {
       console.log(sentText);
       try {
         const username = await getCurrentUser();
-        await AddMessage(sentText, username.username, currentGroupId);
+        const imageRef = ref(storage, username.username);
+        var profilePic = "";
+        getDownloadURL(imageRef)
+          .then(async (url) => {
+            profilePic = url;
+            await AddMessage(
+              sentText,
+              username.username,
+              currentGroupId,
+              profilePic
+            );
+          })
+          .catch(async (error) => {
+            profilePic = profile;
+            await AddMessage(
+              sentText,
+              username.username,
+              currentGroupId,
+              profilePic
+            );
+          });
         conn.send(sentText);
         setSentText("");
       } catch (error) {
@@ -140,9 +161,7 @@ export default function Chat() {
       try {
         if (currentGroupId !== "") {
           const messages = await GetMessageByGroup(currentGroupId);
-          console.log(messages);
           setPreviousMessages(messages);
-          console.log(previousMessages);
         }
       } catch (error) {
         console.log(error);
@@ -166,6 +185,14 @@ export default function Chat() {
       const username = await getCurrentUser();
       const users = [username.username];
       const newGroup = await AddGroup(users);
+      const imageRef = ref(storage, username.username);
+      getDownloadURL(imageRef)
+        .then(async (url) => {
+          setUrl(url);
+        })
+        .catch(async (error) => {
+          setUrl(profile);
+        });
       setCurrentGroupId(newGroup.InsertedID);
       setNewGroup(true);
     } catch (error) {
@@ -178,9 +205,7 @@ export default function Chat() {
       const username = await getCurrentUser();
 
       try {
-        console.log(username);
         const groupResults = await GetGroupsByUsername(username.username);
-        console.log(groupResults);
         setGroups(groupResults);
       } catch (error) {
         console.log(error);
@@ -205,7 +230,6 @@ export default function Chat() {
     try {
       const newGroups = await GetGroupById(currentGroupId);
       setNewGroup(true);
-      console.log(newGroups);
     } catch (error) {
       console.log(error);
     }
@@ -223,28 +247,46 @@ export default function Chat() {
           });
           setMessage(messageArray);
           setCurrentGroupId(changeGroupId);
-          const username = await getCurrentUser();
-          await CreateRoom(currentGroupId);
-          const ws = new WebSocket(
-            `ws://localhost:9000/ws/${currentGroupId}?username=${username.username}`
-          );
-          if (ws.OPEN) {
-            try {
-              setNewGroup(true);
-              setConn(ws);
-              return;
-            } catch (error) {
-              console.log(error);
-            }
-          }
-          OpenGroupChat();
         }
+        const group = await GetGroupById(currentGroupId);
+        console.log(group);
+        const usernameProfiles = new Map();
+        group.Users.map((user) => {
+          const imageRef = ref(storage, user);
+          getDownloadURL(imageRef)
+            .then((url) => {
+              console.log(url);
+              usernameProfiles.set(user, url);
+            })
+            .catch((error) => {
+              console.log(profile);
+              usernameProfiles.set(user, profile);
+            });
+        });
+        setUsernameMap(usernameProfiles);
+        console.log("map");
+        console.log(usernameProfiles);
+        const username = await getCurrentUser();
+        await CreateRoom(currentGroupId);
+        const ws = new WebSocket(
+          `ws://localhost:9000/ws/${currentGroupId}?username=${username.username}`
+        );
+        if (ws.OPEN) {
+          try {
+            setNewGroup(true);
+            setConn(ws);
+            return;
+          } catch (error) {
+            console.log(error);
+          }
+        }
+        OpenGroupChat();
       } catch (error) {
         console.log(error);
       }
     };
     wsHandler();
-  }, [changeGroupId]);
+  }, [changeGroupId, currentGroupId]);
 
   useEffect(() => {
     const connection = async () => {
@@ -255,7 +297,6 @@ export default function Chat() {
       var username = {};
       try {
         username = await getCurrentUser();
-        console.log(username);
       } catch (error) {
         console.log(error);
       }
@@ -268,47 +309,28 @@ export default function Chat() {
         console.log("Connected Successfully");
       };
 
-      conn.onmessage = (event) => {
+      conn.onmessage = async (event) => {
         const m = JSON.parse(event.data);
-        console.log(m);
-
         if (m.content === "New User Joined...") {
           console.log("new user joined");
         } else if (m.content === "User Disconnected...") {
           console.log("User Disconnected...");
         } else if (m.username === username.username) {
-          console.log(m);
-          const imageRef = ref(storage, m.username);
-          var profilePic = "";
-          getDownloadURL(imageRef)
-            .then((url) => {
-              profilePic = url;
-            })
-            .catch((error) => {
-              profilePic = profile;
-            });
           const newMessage = {
             Type: "self",
             Content: m.content,
+            Username: m.username,
             Group: currentGroupId,
-            Image: profilePic,
+            Image: usernameMap.get(m.username),
           };
           setMessage([...message, newMessage]);
         } else {
-          const imageRef = ref(storage, m.username);
-          var profilePic = "";
-          getDownloadURL(imageRef)
-            .then((url) => {
-              profilePic = url;
-            })
-            .catch((error) => {
-              profilePic = profile;
-            });
           const newMessage = {
             Type: "received",
             Content: m.content,
+            Username: m.username,
             Group: currentGroupId,
-            Image: profilePic,
+            Image: usernameMap.get(m.username),
           };
           setMessage([...message, newMessage]);
         }

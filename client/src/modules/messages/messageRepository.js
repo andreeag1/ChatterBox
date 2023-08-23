@@ -1,4 +1,4 @@
-export const AddMessage = async (message, username, groupId) => {
+export const AddMessage = async (message, username, groupId, picture) => {
   const res = await fetch(`http://localhost:9000/message/add`, {
     method: "POST",
     headers: {
@@ -8,6 +8,7 @@ export const AddMessage = async (message, username, groupId) => {
       message: message,
       from: username,
       groupId: groupId,
+      picture: picture,
     }),
   });
   const data = await res.json();

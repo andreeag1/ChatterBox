@@ -31,7 +31,7 @@ func (m MessageImplementation) AddMessage(w http.ResponseWriter, r *http.Request
 
 	json.NewDecoder(r.Body).Decode(&message)
 
-	result := m.repository.InsertMessage(r.Context(), message.Message, message.From, message.GroupId)
+	result := m.repository.InsertMessage(r.Context(), message.Message, message.From, message.GroupId, message.Picture)
 	if result == nil {
 		fmt.Println(result)
 		return

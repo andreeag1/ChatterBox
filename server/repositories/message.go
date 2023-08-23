@@ -11,7 +11,7 @@ import (
 )
 
 type MessageRepository interface {
-	InsertMessage(ctx context.Context, content string, username string, groupId primitive.ObjectID) *mongo.InsertOneResult
+	InsertMessage(ctx context.Context, content string, username string, groupId primitive.ObjectID, picture string) *mongo.InsertOneResult
 	FindMessagesByGroup(ctx context.Context, groupId primitive.ObjectID) ([]models.Message, error)
 }
 
@@ -25,7 +25,7 @@ func NewMessageRepository(client *mongo.Client) MessageRepository {
 	}
 }
 
-func (m MessageRepositoryImplementation) InsertMessage(ctx context.Context, content string, username string, groupId primitive.ObjectID) *mongo.InsertOneResult {
+func (m MessageRepositoryImplementation) InsertMessage(ctx context.Context, content string, username string, groupId primitive.ObjectID, picture string) *mongo.InsertOneResult {
 	messageCollection := m.client.Database("chatterbox").Collection("messages")
 
 	newMessage := models.Message{
@@ -33,6 +33,7 @@ func (m MessageRepositoryImplementation) InsertMessage(ctx context.Context, cont
 		From:		username,
 		GroupId: 	groupId,
 		Message:	content,
+		Picture:	picture,
 	}
 
 	result, err := messageCollection.InsertOne(ctx, newMessage)

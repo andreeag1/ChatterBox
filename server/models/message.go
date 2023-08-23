@@ -9,4 +9,5 @@ type Message struct {
 	From		string				`bson:"from"`
 	GroupId		primitive.ObjectID	`bson:"groupid"`
 	Message		string				`bson:"message"`
+	Picture		string				`bson:"picture"`
 }

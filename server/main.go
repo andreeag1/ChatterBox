@@ -51,7 +51,7 @@ func main() {
 	configs.ConnectDB()
 
 	c := cors.New(cors.Options{
-        AllowedOrigins: []string{"http://localhost:3000"},
+        AllowedOrigins: []string{"http://localhost:3000", "http://localhost:3001"},
         AllowCredentials: true,
     })
 

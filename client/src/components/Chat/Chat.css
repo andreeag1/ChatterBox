@@ -153,6 +153,10 @@
 
 .convo {
   margin-top: -3.5rem;
+  width: 170px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .right-section {
@@ -325,7 +329,7 @@
     width: 95%;
     min-height: 30%;
     height: 75vh;
-    margin-left: 4rem;
+    margin-left: 2rem;
     padding-top: -1rem;
     margin-top: 3rem;
     border-radius: 5%;

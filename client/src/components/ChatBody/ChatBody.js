@@ -22,8 +22,8 @@ export default function ChatBody({ message, previous, group }) {
     const lastChildElement = ref.current?.lastElementChild;
     lastChildElement?.scrollIntoView({
       behavior: "smooth",
-      block: "nearest",
-      inline: "start",
+      block: "end",
+      inline: "end",
     });
   };
 

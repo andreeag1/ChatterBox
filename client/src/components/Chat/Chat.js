@@ -22,6 +22,7 @@ import {
 import { storage } from "../../firebase.js";
 import { ref, getDownloadURL } from "firebase/storage";
 import Profile from "../Profile/Profile";
+import groupImage from "../../pictures/group.png";
 
 const CssTextField = styled(TextField)(({ theme }) => ({
   input: {
@@ -62,8 +63,11 @@ export default function Chat() {
   const [currentGroupId, setCurrentGroupId] = React.useState("");
   const [previousMessages, setPreviousMessages] = React.useState([]);
   const [changeGroupId, setChangeGroupId] = React.useState("");
-  const [url, setUrl] = React.useState(null);
   const [usernameMap, setUsernameMap] = React.useState(new Map());
+  const [groupMap, setGroupMap] = React.useState(new Map());
+  const [currentUsername, setCurrentUsername] = React.useState("");
+  const [lastMessageMap, setLastMessageMap] = React.useState(new Map());
+  const [newLastMessage, setNewLastMessage] = React.useState(false);
 
   const handleSendText = async () => {
     if (conn !== null) {
@@ -112,7 +116,7 @@ export default function Chat() {
     };
 
     getPreviousMessages();
-  }, [currentGroupId]);
+  }, [currentGroupId, changeGroupId]);
 
   const AddUser = async () => {
     try {
@@ -128,7 +132,7 @@ export default function Chat() {
       const username = await getCurrentUser();
       const users = [username.username];
       const newGroup = await AddGroup(users);
-      setCurrentGroupId(newGroup.InsertedID);
+      setChangeGroupId(newGroup.InsertedID);
       setNewGroup(true);
     } catch (error) {
       console.log(error);
@@ -136,38 +140,36 @@ export default function Chat() {
   };
 
   useEffect(() => {
-    const HandleGroups = async () => {
+    const profiles = async () => {
       const username = await getCurrentUser();
-      try {
-        const groupResults = await GetGroupsByUsername(username.username);
-        setGroups(groupResults);
-      } catch (error) {
-        console.log(error);
-      }
+      const groups = await GetGroupsByUsername(username.username);
+      const groupProfiles = new Map();
+      groups.map((group) => {
+        group.Users.map(async (user) => {
+          const imageRef = ref(storage, user);
+          await getDownloadURL(imageRef)
+            .then((url) => {
+              groupProfiles.set(user, url);
+            })
+            .catch((error) => {
+              groupProfiles.set(user, profile);
+            });
+        });
+      });
+      setGroupMap(groupProfiles);
+      const lastMessage = new Map();
+      groups.map(async (group) => {
+        const messages = await GetMessageByGroup(group.Id);
+        if (messages.length !== 0) {
+          lastMessage.set(group.Id, messages[messages.length - 1].Message);
+        }
+      });
+      setLastMessageMap(lastMessage);
+      console.log(lastMessageMap);
+      setNewLastMessage(true);
     };
-    HandleGroups();
-  }, [newGroup, addUser]);
-
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
-      handleSendText();
-    }
-  };
-
-  const handleUserKeyDown = (event) => {
-    if (event.key === "Enter") {
-      AddUser();
-    }
-  };
-
-  const OpenGroupChat = async () => {
-    try {
-      const newGroups = await GetGroupById(currentGroupId);
-      setNewGroup(true);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    profiles();
+  }, [currentGroupId]);
 
   useEffect(() => {
     const wsHandler = async () => {
@@ -218,25 +220,79 @@ export default function Chat() {
   }, [changeGroupId, currentGroupId]);
 
   useEffect(() => {
+    const HandleGroups = async () => {
+      const username = await getCurrentUser();
+      setCurrentUsername(username.username);
+      try {
+        const groupResults = await GetGroupsByUsername(username.username);
+        const newArray = [];
+        groupResults.map(async (group) => {
+          if (group.Users.length === 2) {
+            group.Users.map((user) => {
+              if (user !== username.username) {
+                const newGroupObj = {
+                  LastMessage: lastMessageMap.get(group.Id),
+                  Group: group,
+                  Profile: groupMap.get(user),
+                };
+                newArray.push(newGroupObj);
+                console.log(newArray);
+              }
+            });
+          } else if (group.Users.length === 1) {
+            const newGroupObj = {
+              LastMessage: lastMessageMap.get(group.Id),
+              Group: group,
+              Profile: profile,
+            };
+            newArray.push(newGroupObj);
+          } else {
+            const newGroupObj = {
+              LastMessage: lastMessageMap.get(group.Id),
+              Group: group,
+              Profile: groupImage,
+            };
+            newArray.push(newGroupObj);
+          }
+        });
+        setGroups(newArray);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    HandleGroups();
+  }, [newGroup, addUser, newLastMessage, message]);
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleSendText();
+    }
+  };
+
+  const handleUserKeyDown = (event) => {
+    if (event.key === "Enter") {
+      AddUser();
+    }
+  };
+
+  const OpenGroupChat = async () => {
+    try {
+      await GetGroupById(currentGroupId);
+      setNewGroup(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
     const connection = async () => {
       if (conn === null) {
         return;
       }
-
       var username = {};
       try {
         username = await getCurrentUser();
-      } catch (error) {
-        console.log(error);
-      }
-
-      conn.onclose = () => {
-        console.log("User Disconnected");
-      };
-
-      conn.onopen = () => {
-        console.log("Connected Successfully");
-      };
+      } catch (error) {}
 
       conn.onmessage = async (event) => {
         const m = JSON.parse(event.data);
@@ -287,29 +343,33 @@ export default function Chat() {
                 return (
                   <div
                     className="single-chat"
-                    key={group.Id}
-                    onClick={(e) => setChangeGroupId(group.Id)}
+                    key={group.Group.Id}
+                    onClick={(e) => setChangeGroupId(group.Group.Id)}
                   >
-                    <img className="profileImg" src={profile} alt="" />
+                    <img className="profileImg" src={group.Profile} alt="" />
                     <div className="names">
                       <div className="convo-names">
-                        {group.Users.map((user) => {
-                          if (
-                            group.Users[0] == user &&
-                            group.Users.length == 1
-                          ) {
-                            return <h5>{user} </h5>;
-                          } else if (
-                            group.Users[group.Users.length - 1] == user
-                          ) {
-                            return <h5>{user}</h5>;
-                          } else {
-                            return <h5>{user}, </h5>;
+                        {group.Group.Users.map((user) => {
+                          if (user !== currentUsername) {
+                            if (
+                              (group.Group.Users[1] == user ||
+                                group.Group.Users[0] == user) &&
+                              group.Group.Users.length == 2
+                            ) {
+                              return <h5>{user} </h5>;
+                            } else if (
+                              group.Group.Users[group.Group.Users.length - 1] ==
+                              user
+                            ) {
+                              return <h5>{user}</h5>;
+                            } else {
+                              return <h5>{user}, </h5>;
+                            }
                           }
                         })}
                       </div>
                       <div className="convo">
-                        <h6>Heyyyyy!</h6>
+                        <h6>{group.LastMessage}</h6>
                       </div>
                     </div>
                   </div>
@@ -357,6 +417,7 @@ export default function Chat() {
                     sx={{
                       width: "600px",
                     }}
+                    multiline
                     className="send-text"
                     onChange={(e) => setSentText(e.target.value)}
                     onKeyDown={handleKeyDown}

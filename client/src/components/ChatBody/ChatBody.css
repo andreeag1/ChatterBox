@@ -35,8 +35,9 @@
   padding-top: 0.8rem;
   border-radius: 20px;
   padding-bottom: 0.5rem;
-  max-width: 400px;
+  max-width: 50%;
   max-height: auto;
+  word-wrap: break-word;
 }
 
 .current-user {
@@ -57,7 +58,8 @@
   padding-top: 0.8rem;
   border-radius: 20px;
   margin-right: 0.8rem;
-  max-width: 400px;
+  max-width: 50%;
   max-height: auto;
   padding-bottom: 0.5rem;
+  word-wrap: break-word;
 }

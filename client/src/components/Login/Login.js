@@ -118,6 +118,7 @@ export default function Login({ login, setLogin }) {
           <CssTextField
             id="loginPassword"
             value={values.loginPassword}
+            type="password"
             placeholder="password"
             style={{ minWidth: "50px" }}
             onChange={handleChange}

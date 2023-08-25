@@ -9,7 +9,7 @@
   margin-top: 20px;
   font-family: Caprasimo;
   font-size: 30px;
-  color: white;
+  color: azure;
 }
 
 .box {
@@ -35,7 +35,6 @@
   flex-wrap: wrap;
   background-color: #b9c3cd;
   position: relative;
-  align-items: center;
   border-radius: 25px;
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
@@ -50,18 +49,18 @@
 
 .chats {
   padding-left: 4rem;
-  margin-top: -170px;
   font-family: Caprasimo;
   font-size: 20px;
+  margin-top: -3rem;
+  position: relative;
 }
 
 .chats-section {
   width: 330px;
-  height: 650px;
-  margin-top: 0px;
+  height: auto;
+  max-height: 650px;
   justify-content: flex-start;
   align-items: flex-start;
-  margin-bottom: 3rem;
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 15px;
@@ -72,6 +71,7 @@
   height: 100px;
   width: 90%;
   min-width: 30%;
+  margin-top: 1rem;
   margin-bottom: 2rem;
   position: relative;
   color: black;
@@ -144,15 +144,15 @@
   margin-top: -5px;
 }
 
-.convo-names.h5 {
+/* .convo-names h5 {
   width: 170px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
+} */
 
-.convo {
-  margin-top: -3.5rem;
+.convo h6 {
+  margin-top: -1.5rem;
   width: 170px;
   overflow: hidden;
   white-space: nowrap;
@@ -229,7 +229,6 @@
   display: flex;
   flex-direction: row;
   margin-left: 2rem;
-  position: absolute;
   bottom: 5px;
 }
 
@@ -315,13 +314,14 @@
 
   .chats {
     padding-left: 4rem;
-    margin-top: -50px;
+    margin-top: -9rem;
     font-family: Caprasimo;
     font-size: 20px;
   }
 
   .right-section {
-    margin-right: 6rem;
+    margin-top: -10rem;
+    margin-right: 2rem;
   }
 
   .conversations {
@@ -332,7 +332,7 @@
     margin-left: 2rem;
     padding-top: -1rem;
     margin-top: 3rem;
-    border-radius: 5%;
+    border-radius: 30px;
     position: relative;
     margin-bottom: 200px;
     display: flex;

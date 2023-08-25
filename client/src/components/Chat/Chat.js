@@ -68,6 +68,7 @@ export default function Chat() {
   const [currentUsername, setCurrentUsername] = React.useState("");
   const [lastMessageMap, setLastMessageMap] = React.useState(new Map());
   const [newLastMessage, setNewLastMessage] = React.useState(false);
+  const [currentGroupUsers, setCurrentGroupUsers] = React.useState([]);
 
   const handleSendText = async () => {
     if (conn !== null) {
@@ -169,7 +170,7 @@ export default function Chat() {
       setNewLastMessage(true);
     };
     profiles();
-  }, [currentGroupId]);
+  }, [currentGroupId, changeGroupId]);
 
   useEffect(() => {
     const wsHandler = async () => {
@@ -185,6 +186,7 @@ export default function Chat() {
           setCurrentGroupId(changeGroupId);
         }
         const group = await GetGroupById(currentGroupId);
+        setCurrentGroupUsers(group.Users);
         const usernameProfiles = new Map();
         group.Users.map((user) => {
           const imageRef = ref(storage, user);
@@ -378,7 +380,7 @@ export default function Chat() {
             </div>
           </div>
           <div className="right-section">
-            <Profile />
+            <Profile group={currentGroupUsers} />
             {newGroup ? (
               <div className="conversations">
                 <div className="add-user">
@@ -418,7 +420,7 @@ export default function Chat() {
                       width: "600px",
                     }}
                     multiline
-                    className="send-text"
+                    inputProps={{ style: { color: "white" } }}
                     onChange={(e) => setSentText(e.target.value)}
                     onKeyDown={handleKeyDown}
                   />

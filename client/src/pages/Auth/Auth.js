@@ -125,6 +125,7 @@ export default function Auth() {
           <CssTextField
             id="password"
             value={values.password}
+            type="password"
             placeholder="password"
             style={{ minWidth: "50px" }}
             onChange={handleChange}
@@ -146,6 +147,7 @@ export default function Auth() {
           <CssTextField
             id="passwordConfirmation"
             value={values.passwordConfirmation}
+            type="password"
             placeholder="confirm password"
             style={{ minWidth: "50px" }}
             onChange={handleChange}

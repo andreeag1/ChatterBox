@@ -12,14 +12,16 @@ import { getCurrentUser } from "../../modules/users/userRepository";
 import { storage } from "../../firebase.js";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-export default function Profile() {
+export default function Profile({ group }) {
   const [url, setUrl] = React.useState(null);
   const [image, setImage] = React.useState(null);
   const [openProfileDialog, setOpenProfileDialog] = React.useState(false);
+  const [currentUsername, setCurrentUsername] = React.useState("");
 
   useEffect(() => {
     const handleProfilePic = async () => {
       const username = await getCurrentUser();
+      setCurrentUsername(username.username);
       const imageRef = ref(storage, username.username);
       getDownloadURL(imageRef)
         .then((url) => {
@@ -64,24 +66,46 @@ export default function Profile() {
 
   return (
     <div className="profile-section">
-      <img
-        className="myProfileImg"
-        src={url}
-        alt=""
-        onClick={handleClickOpen}
-      />
-      <Dialog open={openProfileDialog} onClose={handleClose}>
-        <DialogTitle>Set Profile Image</DialogTitle>
-        <DialogContent>
-          <input type="file" onChange={handleProfileChange} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Close</Button>
-          <Button onClick={handleSubmitProfile} autoFocus>
-            Set image
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <div className="group-title-section">
+        {group.map((user) => {
+          console.log(group);
+          if (user !== currentUsername) {
+            if (
+              (group[1] === user || group[0] === user) &&
+              group.length === 2
+            ) {
+              console.log("hello1");
+              return <h5 className="group-text">{user} </h5>;
+            } else if (group[group.length - 1] === user) {
+              console.log(user);
+              return <h5 className="group-text">{user} </h5>;
+            } else {
+              console.log(user);
+              return <h5 className="group-text">{user}, </h5>;
+            }
+          }
+        })}
+      </div>
+      <div className="profile-image">
+        <img
+          className="myProfileImg"
+          src={url}
+          alt=""
+          onClick={handleClickOpen}
+        />
+        <Dialog open={openProfileDialog} onClose={handleClose}>
+          <DialogTitle>Set Profile Image</DialogTitle>
+          <DialogContent>
+            <input type="file" onChange={handleProfileChange} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Close</Button>
+            <Button onClick={handleSubmitProfile} autoFocus>
+              Set image
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
     </div>
   );
 }

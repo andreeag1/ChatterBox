@@ -14,7 +14,7 @@
 
 .box {
   width: 90%;
-  min-height: 100%;
+  max-height: 240vh;
   height: 90vh;
   margin-top: 10px;
   margin-left: 50px;
@@ -28,6 +28,7 @@
 
 .box-two {
   width: 96%;
+
   height: 85vh;
   max-height: fit-content;
   display: flex;
@@ -264,6 +265,12 @@
   background: #555;
 }
 
+.new-chat-button {
+  width: 100px;
+  margin-left: 150px;
+  margin-top: 10px;
+}
+
 @media (max-width: 1247px) {
   .chats {
     margin-top: 0rem;
@@ -280,6 +287,22 @@
     height: 40px;
     margin-top: 15px;
     margin-right: 2rem;
+  }
+
+  .new-chat-button {
+    margin-left: 0;
+  }
+
+  .start-chatting {
+    margin-left: 70px;
+  }
+
+  .conversations {
+    margin-right: 4rem;
+  }
+
+  .no-chats {
+    margin-left: 1rem;
   }
 }
 
@@ -314,13 +337,12 @@
 
   .chats {
     padding-left: 4rem;
-    margin-top: -9rem;
+    margin-top: -4rem;
     font-family: Caprasimo;
     font-size: 20px;
   }
 
   .right-section {
-    margin-top: -10rem;
     margin-right: 2rem;
   }
 

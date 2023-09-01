@@ -15,7 +15,7 @@ export const CreateRoom = async (id) => {
 };
 
 export const GetRooms = async () => {
-  const res = await fetch(`${BACKEND_URL}/ws/get`, {
+  const res = await fetch(`${BACKEND_URL}/ws`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

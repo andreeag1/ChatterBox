@@ -76,7 +76,6 @@ export default function Chat() {
 
   const handleSendText = async () => {
     if (conn !== null) {
-      console.log(sentText);
       try {
         conn.send(sentText);
         const username = await getCurrentUser();
@@ -103,9 +102,7 @@ export default function Chat() {
           });
 
         setSentText("");
-      } catch (error) {
-        console.log(error);
-      }
+      } catch (error) {}
     }
   };
 
@@ -116,9 +113,7 @@ export default function Chat() {
           const messages = await GetMessageByGroup(currentGroupId);
           setPreviousMessages(messages);
         }
-      } catch (error) {
-        console.log(error);
-      }
+      } catch (error) {}
     };
 
     getPreviousMessages();
@@ -128,9 +123,7 @@ export default function Chat() {
     try {
       await AddUserToGroup(addUser, currentGroupId);
       setAddUser("");
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   const CreateGroup = async () => {
@@ -140,9 +133,7 @@ export default function Chat() {
       const newGroup = await AddGroup(users);
       setChangeGroupId(newGroup.InsertedID);
       setNewGroup(true);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -204,23 +195,28 @@ export default function Chat() {
         });
         setUsernameMap(usernameProfiles);
         const username = await getCurrentUser();
-        await CreateRoom(currentGroupId);
-
+        const rooms = await GetRooms();
+        var roomId = "";
+        rooms.map((room) => {
+          if (room.id === currentGroupId) {
+            roomId = room.id;
+          }
+        });
+        if (roomId === "") {
+          await CreateRoom(currentGroupId);
+          roomId = currentGroupId;
+        }
         const ws = new WebSocket(
-          `${WEBSOCKET_URL}/${currentGroupId}?username=${username.username}`
+          `${WEBSOCKET_URL}/${roomId}?username=${username.username}`
         );
         if (ws.OPEN) {
           try {
             setNewGroup(true);
             setConn(ws);
-          } catch (error) {
-            console.log(error);
-          }
+          } catch (error) {}
         }
         OpenGroupChat();
-      } catch (error) {
-        console.log(error);
-      }
+      } catch (error) {}
     };
     wsHandler();
   }, [changeGroupId, currentGroupId]);
@@ -261,9 +257,7 @@ export default function Chat() {
           }
         });
         setGroups(newArray);
-      } catch (error) {
-        console.log(error);
-      }
+      } catch (error) {}
     };
     HandleGroups();
   }, [newGroup, addUser, newLastMessage, message]);
@@ -284,9 +278,7 @@ export default function Chat() {
     try {
       await GetGroupById(currentGroupId);
       setNewGroup(true);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -301,12 +293,8 @@ export default function Chat() {
 
       conn.onmessage = async (event) => {
         const m = JSON.parse(event.data);
-        if (m.content === "New User Joined...") {
-          console.log("new user joined");
-        } else if (m.content === "User Disconnected...") {
-          console.log("User Disconnected...");
+        if (m.content === "User Disconnected...") {
         } else if (m.username === username.username) {
-          console.log(`NEW MESSAGE: ${m.content}`);
           const newMessage = {
             Type: "self",
             Content: m.content,
@@ -316,7 +304,6 @@ export default function Chat() {
           };
           setMessage([...message, newMessage]);
         } else {
-          console.log(`NEW MESSAGE: ${m.content}`);
           const newMessage = {
             Type: "received",
             Content: m.content,
@@ -443,16 +430,18 @@ export default function Chat() {
               <div className="no-chats">
                 <div className="start-chatting">
                   You're ready to start chatting!
-                  <NewColorButton
-                    sx={{
-                      width: "100px",
-                      marginLeft: "150px",
-                      marginTop: "10px",
-                    }}
-                    onClick={CreateGroup}
-                  >
-                    New Chat
-                  </NewColorButton>
+                  <div className="new-chat-button">
+                    <NewColorButton
+                      // sx={{
+                      //   width: "100px",
+                      //   marginLeft: "150px",
+                      //   marginTop: "10px",
+                      // }}
+                      onClick={CreateGroup}
+                    >
+                      New Chat
+                    </NewColorButton>
+                  </div>
                 </div>
               </div>
             )}

@@ -11,25 +11,31 @@ import profile from "../../pictures/profile.png";
 import { getCurrentUser } from "../../modules/users/userRepository";
 import { storage } from "../../firebase.js";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile({ group }) {
   const [url, setUrl] = React.useState(null);
   const [image, setImage] = React.useState(null);
   const [openProfileDialog, setOpenProfileDialog] = React.useState(false);
   const [currentUsername, setCurrentUsername] = React.useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleProfilePic = async () => {
-      const username = await getCurrentUser();
-      setCurrentUsername(username.username);
-      const imageRef = ref(storage, username.username);
-      getDownloadURL(imageRef)
-        .then((url) => {
-          setUrl(url);
-        })
-        .catch((error) => {
-          setUrl(profile);
-        });
+      try {
+        const username = await getCurrentUser();
+        setCurrentUsername(username.username);
+        const imageRef = ref(storage, username.username);
+        getDownloadURL(imageRef)
+          .then((url) => {
+            setUrl(url);
+          })
+          .catch((error) => {
+            setUrl(profile);
+          });
+      } catch (e) {
+        navigate("/");
+      }
     };
     handleProfilePic();
   });

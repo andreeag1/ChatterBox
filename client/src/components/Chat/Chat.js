@@ -29,6 +29,7 @@ import groupImage from "../../pictures/group.png";
 import { WEBSOCKET_URL } from "../../lib/config";
 import GroupCard from "../GroupCard/GroupCard";
 import { useUser } from "../../lib/context/userContext";
+import { useNavigate } from "react-router-dom";
 
 const CssTextField = styled(TextField)(({ theme }) => ({
   input: {
@@ -74,7 +75,7 @@ export default function Chat() {
   const [lastMessageMap, setLastMessageMap] = React.useState(new Map());
   const [newLastMessage, setNewLastMessage] = React.useState(false);
   const [currentGroupUsers, setCurrentGroupUsers] = React.useState([]);
-  const { currentUser } = useUser();
+  const navigate = useNavigate();
 
   const handleSendText = async () => {
     if (conn !== null) {
@@ -104,7 +105,9 @@ export default function Chat() {
           });
 
         setSentText("");
-      } catch (error) {}
+      } catch (error) {
+        navigate("/");
+      }
     }
   };
 
@@ -122,38 +125,44 @@ export default function Chat() {
       const newGroup = await AddGroup(users);
       setChangeGroupId(newGroup.InsertedID);
       setNewGroup(true);
-    } catch (error) {}
+    } catch (error) {
+      navigate("/");
+    }
   };
 
   useEffect(() => {
     const profiles = async () => {
-      const username = await getCurrentUser();
-      const groups = await GetGroupsByUsername(username.username);
-      const groupProfiles = new Map();
-      groups.map((group) => {
-        group.Users.map(async (user) => {
-          if (user) {
-            const imageRef = ref(storage, user);
-            await getDownloadURL(imageRef)
-              .then((url) => {
-                groupProfiles.set(user, url);
-              })
-              .catch((error) => {
-                groupProfiles.set(user, profile);
-              });
+      try {
+        const username = await getCurrentUser();
+        const groups = await GetGroupsByUsername(username.username);
+        const groupProfiles = new Map();
+        groups.map((group) => {
+          group.Users.map(async (user) => {
+            if (user) {
+              const imageRef = ref(storage, user);
+              await getDownloadURL(imageRef)
+                .then((url) => {
+                  groupProfiles.set(user, url);
+                })
+                .catch((error) => {
+                  groupProfiles.set(user, profile);
+                });
+            }
+          });
+        });
+        setGroupMap(groupProfiles);
+        const lastMessage = new Map();
+        groups.map(async (group) => {
+          const messages = await GetMessageByGroup(group.Id);
+          if (messages.length !== 0) {
+            lastMessage.set(group.Id, messages[messages.length - 1].Message);
           }
         });
-      });
-      setGroupMap(groupProfiles);
-      const lastMessage = new Map();
-      groups.map(async (group) => {
-        const messages = await GetMessageByGroup(group.Id);
-        if (messages.length !== 0) {
-          lastMessage.set(group.Id, messages[messages.length - 1].Message);
-        }
-      });
-      setLastMessageMap(lastMessage);
-      setNewLastMessage(true);
+        setLastMessageMap(lastMessage);
+        setNewLastMessage(true);
+      } catch (e) {
+        navigate("/");
+      }
     };
     profiles();
   }, [currentGroupId, changeGroupId]);
@@ -214,9 +223,9 @@ export default function Chat() {
 
   useEffect(() => {
     const HandleGroups = async () => {
-      const username = await getCurrentUser();
-      setCurrentUsername(username.username);
       try {
+        const username = await getCurrentUser();
+        setCurrentUsername(username.username);
         const groupResults = await GetGroupsByUsername(username.username);
         const newArray = [];
         groupResults.map(async (group) => {
@@ -248,7 +257,9 @@ export default function Chat() {
           }
         });
         setGroups(newArray);
-      } catch (error) {}
+      } catch (error) {
+        navigate("/");
+      }
     };
     HandleGroups();
   }, [newGroup, addUser, newLastMessage, message]);
@@ -284,7 +295,7 @@ export default function Chat() {
 
       conn.onmessage = async (event) => {
         const m = JSON.parse(event.data);
-        if (m.content === "User Disconnected...") {
+        if (m.content === "User disconnected") {
         } else if (m.username === username.username) {
           const newMessage = {
             Type: "self",

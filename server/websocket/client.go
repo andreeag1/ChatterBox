@@ -8,7 +8,6 @@ import (
 )
 
 type Client struct {
-	ID 		string  `json:"id"`
     Message  chan *Message
 	Conn 	*websocket.Conn
     RoomID  string  `json:"roomid"`

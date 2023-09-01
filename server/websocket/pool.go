@@ -38,17 +38,14 @@ func (pool *Pool) Start() {
             }
         case client := <-pool.Unregister:
             if _, ok := pool.Rooms[client.RoomID]; ok {
-                if _, ok := pool.Rooms[client.RoomID].Clients[client.ID]; ok {
-                    if len(pool.Rooms[client.RoomID].Clients) != 0 {
                         pool.Broadcast <- &Message{
                             Content: "User disconnected",
                             RoomId: client.RoomID,
                             Username: client.Username,
                         }
-                    } 
-                    delete(pool.Rooms[client.RoomID].Clients, client.ID)
+                        fmt.Println("User Disconnected")
+                    delete(pool.Rooms[client.RoomID].Clients, client.Username)
                     close(client.Message)
-                }
             }
         case message := <-pool.Broadcast:
             fmt.Println("message exists")

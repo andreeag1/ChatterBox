@@ -68,19 +68,15 @@ export default function Profile({ group }) {
     <div className="profile-section">
       <div className="group-title-section">
         {group.map((user) => {
-          console.log(group);
           if (user !== currentUsername) {
             if (
               (group[1] === user || group[0] === user) &&
               group.length === 2
             ) {
-              console.log("hello1");
               return <h5 className="group-text">{user} </h5>;
             } else if (group[group.length - 1] === user) {
-              console.log(user);
               return <h5 className="group-text">{user} </h5>;
             } else {
-              console.log(user);
               return <h5 className="group-text">{user}, </h5>;
             }
           }

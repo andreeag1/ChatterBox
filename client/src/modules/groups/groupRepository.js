@@ -1,5 +1,7 @@
+import { BACKEND_URL } from "../../lib/config";
+
 export const AddGroup = async (users) => {
-  const res = await fetch(`http://localhost:9000/group/add`, {
+  const res = await fetch(`${BACKEND_URL}/group/add`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -13,7 +15,7 @@ export const AddGroup = async (users) => {
 };
 
 export const AddUserToGroup = async (username, group) => {
-  const res = await fetch(`http://localhost:9000/group/user`, {
+  const res = await fetch(`${BACKEND_URL}/group/user`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -28,7 +30,7 @@ export const AddUserToGroup = async (username, group) => {
 };
 
 export const GetGroupsByUsername = async (username) => {
-  const res = await fetch(`http://localhost:9000/group/${username}`, {
+  const res = await fetch(`${BACKEND_URL}/group/${username}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -39,7 +41,7 @@ export const GetGroupsByUsername = async (username) => {
 };
 
 export const GetGroupById = async (id) => {
-  const res = await fetch(`http://localhost:9000/group/get/${id}`, {
+  const res = await fetch(`${BACKEND_URL}/group/get/${id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

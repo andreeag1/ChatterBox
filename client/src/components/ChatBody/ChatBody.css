@@ -25,6 +25,7 @@
 .other-user {
   display: flex;
   flex-direction: row;
+  width: 100%;
 }
 
 .received-text {

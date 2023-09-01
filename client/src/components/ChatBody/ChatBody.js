@@ -81,19 +81,22 @@ export default function ChatBody({ message, previous, group }) {
       {message.map((newMessage) => {
         if (newMessage.Group === group) {
           if (newMessage.Type === "received") {
-            console.log(newMessage.Image);
             return (
-              <div className="other-user">
-                <img
-                  className="otherUserProfileImg"
-                  src={newMessage.Image}
-                  alt=""
-                />
-                <div className="received-text">{newMessage.Content}</div>
+              <div className="other-user-section">
+                <div className="other-username">
+                  <h7>{newMessage.Username}</h7>
+                </div>
+                <div className="other-user">
+                  <img
+                    className="otherUserProfileImg"
+                    src={newMessage.Image}
+                    alt=""
+                  />
+                  <div className="received-text">{newMessage.Content}</div>
+                </div>
               </div>
             );
           } else if (newMessage.Type === "self") {
-            console.log(newMessage.Image);
             return (
               <div className="current-user">
                 <div className="sent-text">{newMessage.Content}</div>

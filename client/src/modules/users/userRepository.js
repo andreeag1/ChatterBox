@@ -1,5 +1,7 @@
+import { BACKEND_URL } from "../../lib/config";
+
 export const registerUser = async (username, password) => {
-  const res = await fetch(`http://localhost:9000/user/add`, {
+  const res = await fetch(`${BACKEND_URL}/user/add`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -15,7 +17,7 @@ export const registerUser = async (username, password) => {
 };
 
 export const loginUser = async (username, password) => {
-  const res = await fetch(`http://localhost:9000/user/login`, {
+  const res = await fetch(`${BACKEND_URL}/user/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -31,7 +33,7 @@ export const loginUser = async (username, password) => {
 };
 
 export const getCurrentUser = async () => {
-  const res = await fetch(`http://localhost:9000/user/get`, {
+  const res = await fetch(`${BACKEND_URL}/user/get`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

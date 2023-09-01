@@ -14,7 +14,10 @@ import {
   GetGroupsByUsername,
 } from "../../modules/groups/groupRepository";
 import { getCurrentUser } from "../../modules/users/userRepository";
-import { CreateRoom } from "../../modules/websocket/webSocketRepository";
+import {
+  CreateRoom,
+  GetRooms,
+} from "../../modules/websocket/webSocketRepository";
 import {
   AddMessage,
   GetMessageByGroup,
@@ -23,6 +26,7 @@ import { storage } from "../../firebase.js";
 import { ref, getDownloadURL } from "firebase/storage";
 import Profile from "../Profile/Profile";
 import groupImage from "../../pictures/group.png";
+import { WEBSOCKET_URL } from "../../lib/config";
 
 const CssTextField = styled(TextField)(({ theme }) => ({
   input: {
@@ -74,6 +78,7 @@ export default function Chat() {
     if (conn !== null) {
       console.log(sentText);
       try {
+        conn.send(sentText);
         const username = await getCurrentUser();
         const imageRef = ref(storage, username.username);
         var profilePic = "";
@@ -96,7 +101,7 @@ export default function Chat() {
               profilePic
             );
           });
-        conn.send(sentText);
+
         setSentText("");
       } catch (error) {
         console.log(error);
@@ -166,7 +171,6 @@ export default function Chat() {
         }
       });
       setLastMessageMap(lastMessage);
-      console.log(lastMessageMap);
       setNewLastMessage(true);
     };
     profiles();
@@ -201,14 +205,14 @@ export default function Chat() {
         setUsernameMap(usernameProfiles);
         const username = await getCurrentUser();
         await CreateRoom(currentGroupId);
+
         const ws = new WebSocket(
-          `ws://localhost:9000/ws/${currentGroupId}?username=${username.username}`
+          `${WEBSOCKET_URL}/${currentGroupId}?username=${username.username}`
         );
         if (ws.OPEN) {
           try {
             setNewGroup(true);
             setConn(ws);
-            return;
           } catch (error) {
             console.log(error);
           }
@@ -238,7 +242,6 @@ export default function Chat() {
                   Profile: groupMap.get(user),
                 };
                 newArray.push(newGroupObj);
-                console.log(newArray);
               }
             });
           } else if (group.Users.length === 1) {
@@ -303,6 +306,7 @@ export default function Chat() {
         } else if (m.content === "User Disconnected...") {
           console.log("User Disconnected...");
         } else if (m.username === username.username) {
+          console.log(`NEW MESSAGE: ${m.content}`);
           const newMessage = {
             Type: "self",
             Content: m.content,
@@ -312,6 +316,7 @@ export default function Chat() {
           };
           setMessage([...message, newMessage]);
         } else {
+          console.log(`NEW MESSAGE: ${m.content}`);
           const newMessage = {
             Type: "received",
             Content: m.content,

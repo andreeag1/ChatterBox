@@ -1,5 +1,7 @@
+import { BACKEND_URL } from "../../lib/config";
+
 export const AddMessage = async (message, username, groupId, picture) => {
-  const res = await fetch(`http://localhost:9000/message/add`, {
+  const res = await fetch(`${BACKEND_URL}/message/add`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -16,7 +18,7 @@ export const AddMessage = async (message, username, groupId, picture) => {
 };
 
 export const GetMessageByGroup = async (groupId) => {
-  const res = await fetch(`http://localhost:9000/message/${groupId}`, {
+  const res = await fetch(`${BACKEND_URL}/message/${groupId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

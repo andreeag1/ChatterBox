@@ -30,11 +30,11 @@ func (pool *Pool) Start() {
         select {
         case client := <-pool.Register:
             if _, ok := pool.Rooms[client.RoomID]; ok {
+                fmt.Println("Room exists")
                 newRoom := pool.Rooms[client.RoomID]
-
-                if _, ok := newRoom.Clients[client.Username]; !ok {
                     newRoom.Clients[client.Username] = client
-                }
+                    fmt.Println("User Registered")
+                
             }
         case client := <-pool.Unregister:
             if _, ok := pool.Rooms[client.RoomID]; ok {

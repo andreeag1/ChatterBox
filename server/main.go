@@ -4,35 +4,25 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/andreeag1/chatterbox/configs"
 	"github.com/andreeag1/chatterbox/controllers"
 	"github.com/andreeag1/chatterbox/repositories"
 	"github.com/andreeag1/chatterbox/websocket"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 )
 
-// func WsHandler(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
-//     fmt.Println("WebSocket Endpoint Hit")
-//     conn, err := websocket.Upgrade(w, r)
-//     if err != nil {
-//         fmt.Fprintf(w, "%+v\n", err)
-//     }
-
-// 	username := mux.Vars(r)["username"]
-
-//     client := &websocket.Client{
-//         Conn: conn,
-//         Pool: pool,
-// 		Username: username,
-//     }
-
-//     pool.Register <- client
-//     client.Read()
-// }
-
 func main() {
+	if os.Getenv("ENV") != "prod" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
+	}
+
 	r := mux.NewRouter()
 
 	pool := websocket.NewPool()
@@ -51,7 +41,7 @@ func main() {
 	configs.ConnectDB()
 
 	c := cors.New(cors.Options{
-        AllowedOrigins: []string{"http://localhost:3000", "http://localhost:3001"},
+        AllowedOrigins: []string{configs.EnvFrontendUrl()},
         AllowCredentials: true,
     })
 
@@ -74,6 +64,6 @@ func main() {
 	handler := c.Handler(r)
 
 	fmt.Println("Server is getting started...")
-	log.Fatal(http.ListenAndServe(":9000", handler))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", configs.EnvPort()), handler))
 	fmt.Println("Listening on port 9000...")
 }

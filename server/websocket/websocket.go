@@ -51,7 +51,21 @@ func (h *Handler) CreateRoom(w http.ResponseWriter, r *http.Request) {
         Clients: make(map[string]*Client),
     }
 
+    fmt.Println("Room created")
+
     controllers.WriteJSON(w, http.StatusAccepted, req)
+}
+
+func (h *Handler) GetRooms(w http.ResponseWriter, r *http.Request) {
+	rooms := make([]CreateRoomReq, 0)
+
+	for _, result := range h.pool.Rooms {
+		rooms = append(rooms, CreateRoomReq{
+			ID:   result.ID,
+		})
+    }
+
+    controllers.WriteJSON(w, http.StatusAccepted, rooms)
 }
 
 func (h *Handler) JoinRoom(w http.ResponseWriter, r *http.Request) {
@@ -73,20 +87,13 @@ func (h *Handler) JoinRoom(w http.ResponseWriter, r *http.Request) {
     }
 
     h.pool.Register <- cl
+
+    fmt.Println(username, "joined the room")
     
     go cl.WriteMessage()
     cl.Read(h.pool)
 }
 
-func (h *Handler) GetRooms(w http.ResponseWriter, r *http.Request) {
-	rooms := make([]CreateRoomReq, 0)
 
-	for _, r := range h.pool.Rooms {
-		rooms = append(rooms, CreateRoomReq{
-			ID:   r.ID,
-		})
-	}
 
-    controllers.WriteJSON(w, http.StatusAccepted, rooms)
 
-}

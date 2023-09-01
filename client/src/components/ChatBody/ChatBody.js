@@ -12,9 +12,11 @@ import {
 } from "@mui/material";
 import profile from "../../pictures/profile.png";
 import { getCurrentUser } from "../../modules/users/userRepository";
+import { GetMessageByGroup } from "../../modules/messages/messageRepository";
 
-export default function ChatBody({ message, previous, group }) {
+export default function ChatBody({ message, group, changeGroupId }) {
   const [username, setUsername] = React.useState("");
+  const [previousMessages, setPreviousMessages] = React.useState([]);
 
   const ref = useRef(null);
 
@@ -37,15 +39,28 @@ export default function ChatBody({ message, previous, group }) {
       }
     };
     getUsername();
-  }, [previous]);
+  }, [previousMessages]);
 
   useEffect(() => {
     scrollToBottom();
   }, [message]);
 
+  useEffect(() => {
+    const getPreviousMessages = async () => {
+      try {
+        if (group !== "") {
+          const messages = await GetMessageByGroup(group);
+          setPreviousMessages(messages);
+        }
+      } catch (error) {}
+    };
+
+    getPreviousMessages();
+  }, [group, changeGroupId]);
+
   return (
     <div className="texts" ref={ref}>
-      {previous.map((newMessage) => {
+      {previousMessages.map((newMessage) => {
         if (newMessage.From !== username) {
           return (
             <div className="other-user-section">

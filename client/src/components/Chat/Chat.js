@@ -27,6 +27,8 @@ import { ref, getDownloadURL } from "firebase/storage";
 import Profile from "../Profile/Profile";
 import groupImage from "../../pictures/group.png";
 import { WEBSOCKET_URL } from "../../lib/config";
+import GroupCard from "../GroupCard/GroupCard";
+import { useUser } from "../../lib/context/userContext";
 
 const CssTextField = styled(TextField)(({ theme }) => ({
   input: {
@@ -65,7 +67,6 @@ export default function Chat() {
   const [groups, setGroups] = React.useState([]);
   const [addUser, setAddUser] = React.useState("");
   const [currentGroupId, setCurrentGroupId] = React.useState("");
-  const [previousMessages, setPreviousMessages] = React.useState([]);
   const [changeGroupId, setChangeGroupId] = React.useState("");
   const [usernameMap, setUsernameMap] = React.useState(new Map());
   const [groupMap, setGroupMap] = React.useState(new Map());
@@ -73,6 +74,7 @@ export default function Chat() {
   const [lastMessageMap, setLastMessageMap] = React.useState(new Map());
   const [newLastMessage, setNewLastMessage] = React.useState(false);
   const [currentGroupUsers, setCurrentGroupUsers] = React.useState([]);
+  const { currentUser } = useUser();
 
   const handleSendText = async () => {
     if (conn !== null) {
@@ -106,19 +108,6 @@ export default function Chat() {
     }
   };
 
-  useEffect(() => {
-    const getPreviousMessages = async () => {
-      try {
-        if (currentGroupId !== "") {
-          const messages = await GetMessageByGroup(currentGroupId);
-          setPreviousMessages(messages);
-        }
-      } catch (error) {}
-    };
-
-    getPreviousMessages();
-  }, [currentGroupId, changeGroupId]);
-
   const AddUser = async () => {
     try {
       await AddUserToGroup(addUser, currentGroupId);
@@ -143,14 +132,16 @@ export default function Chat() {
       const groupProfiles = new Map();
       groups.map((group) => {
         group.Users.map(async (user) => {
-          const imageRef = ref(storage, user);
-          await getDownloadURL(imageRef)
-            .then((url) => {
-              groupProfiles.set(user, url);
-            })
-            .catch((error) => {
-              groupProfiles.set(user, profile);
-            });
+          if (user) {
+            const imageRef = ref(storage, user);
+            await getDownloadURL(imageRef)
+              .then((url) => {
+                groupProfiles.set(user, url);
+              })
+              .catch((error) => {
+                groupProfiles.set(user, profile);
+              });
+          }
         });
       });
       setGroupMap(groupProfiles);
@@ -335,37 +326,14 @@ export default function Chat() {
             <div className="chats-section">
               {groups.map((group) => {
                 return (
-                  <div
-                    className="single-chat"
-                    key={group.Group.Id}
-                    onClick={(e) => setChangeGroupId(group.Group.Id)}
-                  >
-                    <img className="profileImg" src={group.Profile} alt="" />
-                    <div className="names">
-                      <div className="convo-names">
-                        {group.Group.Users.map((user) => {
-                          if (user !== currentUsername) {
-                            if (
-                              (group.Group.Users[1] == user ||
-                                group.Group.Users[0] == user) &&
-                              group.Group.Users.length == 2
-                            ) {
-                              return <h5>{user} </h5>;
-                            } else if (
-                              group.Group.Users[group.Group.Users.length - 1] ==
-                              user
-                            ) {
-                              return <h5>{user}</h5>;
-                            } else {
-                              return <h5>{user}, </h5>;
-                            }
-                          }
-                        })}
-                      </div>
-                      <div className="convo">
-                        <h6>{group.LastMessage}</h6>
-                      </div>
-                    </div>
+                  <div onClick={(e) => setChangeGroupId(group.Group.Id)}>
+                    <GroupCard
+                      groupId={group.Group.Id}
+                      groupPicture={group.Profile}
+                      usernames={group.Group.Users}
+                      lastMessage={group.LastMessage}
+                      currentUsername={currentUsername}
+                    />
                   </div>
                 );
               })}
@@ -398,10 +366,9 @@ export default function Chat() {
                 </div>
                 <ChatBody
                   message={message}
-                  previous={previousMessages}
                   group={currentGroupId}
+                  changeGroupId={changeGroupId}
                 />
-
                 <div className="type">
                   <CssTextField
                     value={sentText}
@@ -431,14 +398,7 @@ export default function Chat() {
                 <div className="start-chatting">
                   You're ready to start chatting!
                   <div className="new-chat-button">
-                    <NewColorButton
-                      // sx={{
-                      //   width: "100px",
-                      //   marginLeft: "150px",
-                      //   marginTop: "10px",
-                      // }}
-                      onClick={CreateGroup}
-                    >
+                    <NewColorButton onClick={CreateGroup}>
                       New Chat
                     </NewColorButton>
                   </div>

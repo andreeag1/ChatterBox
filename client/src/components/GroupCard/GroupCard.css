@@ -1,0 +1,84 @@
+.single-chat {
+  height: 100px;
+  width: 90%;
+  min-width: 30%;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  position: relative;
+  color: black;
+  border-radius: 18px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 1.5rem sans-serif;
+  cursor: pointer;
+  will-change: transform;
+}
+
+.single-chat::before,
+.single-chat::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: "";
+  display: block;
+  background-color: #283038;
+  transition: all 250ms ease-in-out;
+}
+
+.single-chat::before {
+  width: 2px;
+  height: 100px;
+  box-shadow: 298px 0 #283038;
+}
+
+.single-chat::after {
+  height: 2px;
+  width: 300px;
+  box-shadow: 0 98px #283038;
+}
+
+.single-chat:hover::before {
+  left: -10px;
+  box-shadow: 318px 0 #283038;
+}
+
+.single-chat:hover::after {
+  top: -10px;
+  box-shadow: 0 118px #283038;
+}
+
+.profileImg {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-top: 0rem;
+  margin-right: 1rem;
+}
+
+.names {
+  font-family: "Courier New", Courier, monospace;
+  margin-right: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.convo-names {
+  width: 170px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: flex;
+  flex-direction: row;
+  margin-top: -5px;
+}
+
+.convo h6 {
+  margin-top: -1.5rem;
+  width: 170px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
